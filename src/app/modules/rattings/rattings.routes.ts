@@ -8,8 +8,7 @@ import { RattingController } from './rattings.controller';
 const router = Router();
 router.post(
   '/send',
-  auth(ENUM_USER_ROLE.USER),
-  validateRequest(RattingValidation.create),
+  auth(ENUM_USER_ROLE.USER), 
   RattingController.insertIntoDB,
 );
 
@@ -20,7 +19,7 @@ router.get(
 );
 
 router.get(
-  '/swap-ratting/:id',
+  '/average-ratting',
   auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
   RattingController.averageRatting,
 );

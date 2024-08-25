@@ -1,5 +1,21 @@
 import { model, Schema } from 'mongoose';
-import { IPoints } from './points.interface';
+import { IPoints, IPointsDetails } from './points.interface';
+
+const pointsDetailsSchema = new Schema<IPointsDetails>({
+  title: {
+    type: String, 
+    required: true,
+  },
+  point: {
+    type: Number,
+    required: true,
+  },
+  date: {
+    type: Date,
+    required: true,
+  },
+}); 
+
 
 const pointSchema = new Schema<IPoints>(
   {
@@ -11,6 +27,9 @@ const pointSchema = new Schema<IPoints>(
     points: {
       type: Number,
       default: 0,
+    },
+    details: {
+      type: [pointsDetailsSchema], 
     },
   },
   { timestamps: true },

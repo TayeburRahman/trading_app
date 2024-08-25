@@ -91,7 +91,7 @@ const approveSwap = async (req: Request) => {
   );
 
   // Update points for the user giving the product (or create if not exists)
-  const data = await Point.findOneAndUpdate(
+ await Point.findOneAndUpdate(
     { user: isExist.userTo },
     { $inc: { points: earnPointToUser } },
     { new: true, upsert: true }

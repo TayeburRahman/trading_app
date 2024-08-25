@@ -31,6 +31,10 @@ export type IReqUser = {
   role: string;
 };
 
+export type Ireting = {
+  userId: string; 
+};
+
 export type IUser = {
   [x: string]: any;
   _id?: string;

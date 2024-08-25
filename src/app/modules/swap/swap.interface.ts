@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { IUser } from '../auth/auth.interface';
+import { Ireting, IUser } from '../auth/auth.interface';
 import { IProducts } from '../products/products.interface';
 
 export type ISwap = {
@@ -10,4 +10,5 @@ export type ISwap = {
   isApproved: 'pending' | 'approved' | 'rejected';
   swapUserToPoint:Number;
   swapUserFromPoint:Number;
+  ratting:Array<IUser> ;
 };

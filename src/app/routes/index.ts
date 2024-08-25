@@ -9,6 +9,7 @@ import { DashboardRoutes } from '../modules/dashboard/dashboard.routes';
 import { UpgradePlanRoutes } from '../modules/upgrade-plan/upgrade-plan.routes';
 import { ProductRoutes } from '../modules/products/products.routes';
 import { SwapRoutes } from '../modules/swap/swap.routes';
+import { RattingRoutes } from '../modules/rattings/rattings.routes';
 
 const router = express.Router();
 
@@ -57,6 +58,11 @@ const moduleRoutes = [
   {
     path: '/swap',
     route: SwapRoutes,
+  },
+  // -- progreass
+  {
+    path: '/review',
+    route: RattingRoutes,
   },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));
