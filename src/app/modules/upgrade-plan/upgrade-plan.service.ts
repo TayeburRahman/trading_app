@@ -50,6 +50,7 @@ const upgradeSubscription = async (req: Request) => {
   global.io.to(checkUser?._id.toString()).emit('notification', notification);
   return subscription;
 };
+
 const AllSubscriber = async (query: Record<string, unknown>) => {
   const subscriptionsQuery = new QueryBuilder(
     Plan.find().populate('user_id'),
@@ -57,7 +58,6 @@ const AllSubscriber = async (query: Record<string, unknown>) => {
   )
     .search(['plan_type'])
     .filter()
-
     .sort()
     .paginate()
     .fields();
@@ -87,6 +87,7 @@ const mySubscription = async (req: Request) => {
   }
   return subscription;
 };
+
 export const UpgradePlanService = {
   upgradeSubscription,
   AllSubscriber,

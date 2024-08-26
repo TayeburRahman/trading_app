@@ -5,14 +5,15 @@ import { messageController } from './message.controller';
 
 import { validateRequest } from '../../middlewares/validateRequest';
 import { MessageValidation } from './messages.validation';
+import { uploadFile } from '../../middlewares/fileUploader';
 
 const router = express.Router();
 
 router.post(
-  '/send-message/:id',
-
-  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.USER),
-  validateRequest(MessageValidation.messages),
+  '/send-message/:id', 
+  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.USER,ENUM_USER_ROLE.ADMIN),
+  // validateRequest(MessageValidation.messages),
+  uploadFile(),
   messageController.sendMessage,
 );
 router.get(

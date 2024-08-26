@@ -9,6 +9,7 @@ const getNotifications = async () => {
   const unreadNotification = await Notification.countDocuments({
     status: false,
   });
+  
   const readNotification = await Notification.countDocuments({ status: true });
   return {
     allNotification,

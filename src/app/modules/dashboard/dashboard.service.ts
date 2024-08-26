@@ -1,14 +1,18 @@
 import { logger } from '../../../shared/logger';
 import User from '../auth/auth.model';
+import Notification from '../notifications/notifications.model';
 import { Subscription } from '../subscriptions/subscriptions.model';
 import { Plan } from '../upgrade-plan/upgrade-plan.model';
+
 const getYearRange = (year: any) => {
   const startDate = new Date(`${year}-01-01`);
   const endDate = new Date(`${year}-12-31`);
   return { startDate, endDate };
 };
+
 const totalCount = async () => {
   const totalUser = await User.countDocuments({ role: 'USER' });
+
   const totalIncome = await Plan.aggregate([
     {
       $group: {
@@ -30,6 +34,7 @@ const totalCount = async () => {
     diamondUsers,
   };
 };
+
 const getMonthlySubscriptionGrowth = async (year?: number) => {
   try {
     const currentYear = new Date().getFullYear();
@@ -103,6 +108,7 @@ const getMonthlySubscriptionGrowth = async (year?: number) => {
     throw error;
   }
 };
+
 const latestPendingUsers = async () => {
   const pendingUsers = await User.find({ isApproved: false }).sort({
     createdAt: -1,
@@ -110,6 +116,7 @@ const latestPendingUsers = async () => {
 
   return pendingUsers;
 };
+
 const getMonthlyUserGrowth = async (year?: number) => {
   try {
     const currentYear = new Date().getFullYear();
@@ -186,7 +193,9 @@ const getMonthlyUserGrowth = async (year?: number) => {
     throw error;
   }
 };
+
 const approveUser = async (userId: string) => {
+ 
   try {
     const user = await User.findById(userId);
     if (!user) {
@@ -194,11 +203,26 @@ const approveUser = async (userId: string) => {
     }
     user.isApproved = true;
     await user.save();
+
+     const notificationMessage = `Your application is approved successfully.`;
+     const notification = await Notification.create({
+       title: 'Your successfully registered!', 
+       user: userId,
+       message: notificationMessage,
+     });
+
+     //@ts-ignore
+     const socketIo = global.io;
+     if (socketIo) {
+       socketIo.emit(`notification::${notification?._id.toString()}`, notification); 
+     }  
+
     return user;
   } catch (error) {
     logger.error('Error in approveUser function: ', error);
     throw error;
   }
+  
 };
 
 const rejectUser = async (userId: string) => {
@@ -215,6 +239,7 @@ const rejectUser = async (userId: string) => {
     throw error;
   }
 };
+
 const getUserTypePoints = async () => {
   try {
     const goldUsers = await User.find({ userType: 'Gold' });
@@ -249,6 +274,7 @@ const getUserTypePoints = async () => {
     throw error;
   }
 };
+
 export const DashboardService = {
   totalCount,
   getMonthlySubscriptionGrowth,

@@ -10,6 +10,7 @@ router.get(
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   NotificationController.getNotifications,
 );
+
 router.get(
   '/my-notifications',
   auth(ENUM_USER_ROLE.USER),

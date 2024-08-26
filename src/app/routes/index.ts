@@ -10,6 +10,8 @@ import { UpgradePlanRoutes } from '../modules/upgrade-plan/upgrade-plan.routes';
 import { ProductRoutes } from '../modules/products/products.routes';
 import { SwapRoutes } from '../modules/swap/swap.routes';
 import { RattingRoutes } from '../modules/rattings/rattings.routes';
+import { MessageRoutes } from '../modules/messages/message.routes';
+import { NotificationRoutes } from '../modules/notifications/notifications.routes';
 
 const router = express.Router();
 
@@ -29,22 +31,27 @@ const moduleRoutes = [
     path: '/sub-category',
     route: SubCategoryRoutes,
   },
+    // -- done
   {
     path: '/subscription',
     route: SubscriptionsRoutes,
   },
+     // -- done
   {
     path: '/adds',
     route: AddsRoutes,
   },
+    // -- done
   {
     path: '/rules',
     route: ManageRoutes,
   },
+  // -- done
   {
     path: '/dashboard',
     route: DashboardRoutes,
   },
+      // -- done
   {
     path: '/plan',
     route: UpgradePlanRoutes,
@@ -59,10 +66,19 @@ const moduleRoutes = [
     path: '/swap',
     route: SwapRoutes,
   },
-  // -- progreass
+    // -- done
   {
     path: '/review',
     route: RattingRoutes,
+  },
+  // -- progressing
+  {
+    path: '/message',
+    route: MessageRoutes,
+  },
+  {
+    path: '/notification',
+    route: NotificationRoutes,
   },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));

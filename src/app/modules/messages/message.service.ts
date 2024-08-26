@@ -6,14 +6,56 @@ import ApiError from '../../../errors/ApiError';
 import User from '../auth/auth.model';
 
 //* One to one conversation
+// const sendMessage = async (req: Request) => {
+//   const { id: receiverId } = req.params;
+//   const senderId = req.user?.userId;
+//   const data = req.body;
+
+//   const { message } = data;
+
+//   if (receiverId === null || senderId === null) {
+//     throw new ApiError(404, 'Sender or Receiver user not found');
+//   }
+
+//   let conversation = await Conversation.findOne({
+//     participants: { $all: [senderId, receiverId] },
+//   });
+
+//   if (!conversation) {
+//     conversation = await Conversation.create({
+//       participants: [senderId, receiverId],
+//     });
+
+//     const newMessage = new Message({
+//       senderId,
+//       receiverId,
+//       message,
+//       conversationId: conversation._id,
+//     });
+
+//     if (newMessage) {
+//       conversation.messages.push(newMessage._id);
+//     }
+//     await Promise.all([conversation.save(), newMessage.save()]);
+//     //@ts-ignore
+//     const socketIO = global.io;
+//     if (socketIO && conversation && newMessage) {
+//       //@ts-ignore
+//       // socketIO.to(receiverId).emit('getMessage', newMessage);
+//       socketIO.emit(`message::${conversation._id.toString()}`, newMessage);
+//     }
+
+//     return newMessage;
+//   }
+// };
+
 const sendMessage = async (req: Request) => {
-  const { id: receiverId } = req.params;
+  const { id: receiverId, } = req.params;
   const senderId = req.user?.userId;
-  const data = req.body;
+  const { message } = req.body;
+  const files: any = req.files;
 
-  const { message } = data;
-
-  if (receiverId === null || senderId === null) {
+  if (!receiverId || !senderId) {
     throw new ApiError(404, 'Sender or Receiver user not found');
   }
 
@@ -25,28 +67,31 @@ const sendMessage = async (req: Request) => {
     conversation = await Conversation.create({
       participants: [senderId, receiverId],
     });
-
-    const newMessage = new Message({
-      senderId,
-      receiverId,
-      message,
-      conversationId: conversation._id,
-    });
-
-    if (newMessage) {
-      conversation.messages.push(newMessage._id);
-    }
-    await Promise.all([conversation.save(), newMessage.save()]);
-    //@ts-ignore
-    const socketIO = global.io;
-    if (socketIO && conversation && newMessage) {
-      //@ts-ignore
-      // socketIO.to(receiverId).emit('getMessage', newMessage);
-      socketIO.emit(`message::${conversation._id.toString()}`, newMessage);
-    }
-
-    return newMessage;
   }
+
+  let message_img  = ''
+  if (files?.message_img) {
+     message_img = `/images/message/${files.message_img[0].filename}`;
+  }
+
+  const newMessage = new Message({
+    senderId,
+    receiverId,
+    message,
+    message_img,
+    conversationId: conversation._id,
+  });
+
+  conversation.messages.push(newMessage._id);
+  await Promise.all([conversation.save(), newMessage.save()]);
+   //@ts-ignore
+  const socketIO = global.io; 
+     //@ts-ignore
+  if (socketIO && conversation && newMessage) {
+    socketIO.emit(`message::${conversation._id.toString()}`, newMessage);
+  }
+
+  return newMessage;
 };
 
 //*
@@ -75,7 +120,7 @@ const conversationUser = async () => {
 
   const conversations = await Conversation.find({
     _id: { $in: messageConversations },
-  });
+  }).populate('messages');
 
   const participantIds = [
     ...new Set(conversations.flatMap(convo => convo.participants)),

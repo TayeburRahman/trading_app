@@ -1,58 +1,64 @@
 import { Request } from 'express';
-
 import ApiError from '../../../errors/ApiError';
 import httpStatus from 'http-status';
 import { Ratting } from './rattings.model';
 import { Types } from 'mongoose';
-import { IReqUser } from '../auth/auth.interface';
+import { IReqUser, IUser } from '../auth/auth.interface';
 import User from '../auth/auth.model';
 import { Swap } from '../swap/swap.model'; 
 import { makePoints } from '../points/points.services';
 import { Point } from '../points/points.model';
+import { Subscription } from '../subscriptions/subscriptions.model';
 
-const insertIntoDB = async (req: Request) => {
+const insertIntoDB = async (req: Request): Promise<any> => {
   const { userId } = req.user as IReqUser;
-  const { swapId, ratting, comment } = req.body;
+  const { swapId, ratting, comment } = req.body;  
+ 
   const isExistUser = await User.findById(userId);
   if (!isExistUser) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
-  
-  const isExistSwap = await Swap.findByIdAndUpdate(
-    swapId,
-    { $addToSet: { ratting: userId } },  
-    { new: true }
-  );
-
-  if (!isExistSwap) {
-    throw new ApiError(404, 'Swap not found');
+ 
+  const planName = isExistUser.userType === 'Trial' ? 'Gold' : isExistUser.userType;
+  const isPackagtes = await Subscription.findOne({ planName });
+  if (!isPackagtes) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User subscription plan not found');
   } 
 
-  const points = await makePoints(ratting, isExistUser.userType) 
-  const pointChange = ratting >= 3 ? points : -points; 
+  const isExistSwap = await Swap.findByIdAndUpdate(
+    swapId,
+    { $addToSet: { ratting: userId } },
+    { new: true }
+  );
+  if (!isExistSwap) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Swap not found');
+  } 
 
+  const points = await makePoints(ratting, isPackagtes);
+  const pointChange = ratting >= 3 ? points : -points;
+
+  
   const updatePoint = await Point.findOneAndUpdate(
-    { user: userId }, 
+    { user: userId },
     {
-      $inc: { points: pointChange },  
+      $inc: { points: pointChange },
       $addToSet: {
         details: {
-          title: ratting >= 3 ? "Point Earn for Positive Comment" : "Point Lose for Negative Comment",
+          title: ratting >= 3 ? 'Earn by positive comments!' : 'Lose by nagitive comments!',
           point: pointChange,
-          date: new Date(),  
+          date: new Date(),
         },
       },
     },
-    { new: true }  
-  );  
-
-  if(!updatePoint) {
-    throw new ApiError(404, 'User not found');
-  }  
-
+    { new: true }
+  );
+  if (!updatePoint) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+ 
   return await Ratting.create({
     user: userId,
-    swapOwner: isExistSwap?.userTo,
+    swapOwner: isExistSwap.userTo,
     swap: swapId,
     ratting,
     comment,

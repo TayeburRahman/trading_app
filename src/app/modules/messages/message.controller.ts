@@ -2,10 +2,10 @@ import { Request, RequestHandler, Response } from 'express';
 import sendResponse from '../../../shared/sendResponse';
 import catchAsync from '../../../shared/catchasync';
 import { messageService } from './message.service';
+
 const sendMessage: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const result = await messageService.sendMessage(req);
-
     sendResponse(res, {
       statusCode: 200,
       success: true,
@@ -18,7 +18,6 @@ const sendMessage: RequestHandler = catchAsync(
 const getMessages: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const result = await messageService.getMessages(req, res);
-
     sendResponse(res, {
       statusCode: 200,
       success: true,
@@ -29,7 +28,6 @@ const getMessages: RequestHandler = catchAsync(
 const conversationUser: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const result = await messageService.conversationUser();
-
     sendResponse(res, {
       statusCode: 200,
       success: true,
@@ -40,7 +38,6 @@ const conversationUser: RequestHandler = catchAsync(
 );
 export const messageController = {
   sendMessage,
-  getMessages,
-  messageService,
+  getMessages, 
   conversationUser,
 };

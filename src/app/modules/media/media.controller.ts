@@ -53,6 +53,7 @@ const deleteAdds = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 const deleteVideoAdds = catchAsync(async (req: Request, res: Response) => {
   const result = await AddsService.deleteVideoAdds(req.params.id);
   sendResponse<IAddsVideo>(res, {

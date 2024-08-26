@@ -9,23 +9,27 @@ const subscriptionsSchema = new Schema<ISubscriptions>(
       required: true,
     },
     fee: {
-      type: String,
+      type: Number,
       required: true,
     },
-    pointRange: {
-      type: String,
+    pointRangeStart: {
+      type: Number,
+      required: true,
+    },
+    pointRangeEnd: {
+      type: Number,
       required: true,
     },
     swapPoint: {
-      type: String,
+      type: Number,
       required: true,
     },
     positiveCommentPoint: {
-      type: String,
+      type: Number,
       required: true,
     },
     negativeCommentPoint: {
-      type: String,
+      type: Number,
       required: true,
     },
     duration: {

@@ -13,6 +13,7 @@ const insertIntoDB = async (files: any, payload: IAdds) => {
   if (files?.image) {
     payload.image = `/images/image/${files.image[0].filename}`;
   }
+  
   return await Adds.create(payload);
 };
 const addVideoAdds = async (files: any, payload: IAddsVideo) => {

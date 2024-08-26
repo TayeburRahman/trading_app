@@ -7,11 +7,19 @@ const addsSchema = new Schema<IAdds>(
       type: String,
       required: true,
     },
+    url: {
+      type: String,
+      required: true,
+    },
     image: {
       type: String,
       required: true,
     },
     isPrivate: {
+      type: Boolean,
+      default: false,
+    },
+    isActive: {
       type: Boolean,
       default: false,
     },
