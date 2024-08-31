@@ -42,7 +42,7 @@ const makeSwapPoints = async (product: any, planName: string) => {
     const isPackagtes = await Subscription.findOne({ planName });
     if (!isPackagtes) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User subscription plan not found');
-    } 
+    }  
     
     const fromUserPoints = (Number(product.fromProduct.productValue) * Number(isPackagtes.swapPoint)) / 100;
     const toUserPoints = (Number(product.toProduct.productValue) * Number(isPackagtes.swapPoint)) / 100;

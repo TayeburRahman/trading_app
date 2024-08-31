@@ -5,7 +5,7 @@ const subscriptionsSchema = new Schema<ISubscriptions>(
   {
     planName: {
       type: String,
-      enum: ['Gold', 'Platinum', 'Diamond'],
+      enum: ['Trial', 'Gold', 'Platinum', 'Diamond'],
       required: true,
     },
     fee: {

@@ -10,6 +10,7 @@ import { Point } from '../points/points.model';
 import { Subscription } from '../subscriptions/subscriptions.model';
 import httpStatus from 'http-status';
 import { makeSwapPoints } from '../points/points.services';
+import Notification from '../notifications/notifications.model';
 
 const makeSwap = async (req: Request) => {
   const user = req.user as IReqUser;
@@ -24,14 +25,27 @@ const makeSwap = async (req: Request) => {
     throw new ApiError(400, 'Product or User is missing');
   }
 
-  // console.log("user",isExistUSer)
-
-  return await Swap.create({
+  const result = await Swap.create({
     userFrom: user.userId,
     userTo: payload.userTo,
     productFrom: payload.productFrom,
     productTo: payload.productTo,
   });
+
+  const notificationMessage = 'You have a swap request!.';
+  const notification = await Notification.create({
+    title:  `${isExistUSer.name} request you to swap!`, 
+    user: payload.userTo,
+    message: notificationMessage,
+  });
+
+  //@ts-ignore
+  const socketIo = global.io;
+  if (socketIo) {
+    socketIo.emit(`notification::${notification?._id.toString()}`, notification); 
+  }  
+
+  return result
 };
 
 const pendingSwap = async (req: Request) => {
@@ -80,10 +94,9 @@ const approveSwap = async (req: Request): Promise<any> => {
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
-
-  const planName = user.userType === 'Trial' ? 'Gold' : user.userType;
-
-  const points = await makeSwapPoints({fromProduct, toProduct}, planName);
+ 
+ 
+  const points = await makeSwapPoints({fromProduct, toProduct}, user.userType);
 
   // Update swap and user points in parallel
   const [updatedSwap, fromPoint, toPoint] = await Promise.all([
@@ -123,6 +136,19 @@ const approveSwap = async (req: Request): Promise<any> => {
       { new: true, upsert: true }
     ),
   ]); 
+
+  const notificationMessage = `Accept your swap request!`;
+  const notification = await Notification.create({
+    title:  `Start a chat to swap your product.`, 
+    user: swap.userFrom,
+    message: notificationMessage,
+  });
+
+  //@ts-ignore
+  const socketIo = global.io;
+  if (socketIo) {
+    socketIo.emit(`notification::${notification?._id.toString()}`, notification); 
+  }  
 
   return updatedSwap ;
 };

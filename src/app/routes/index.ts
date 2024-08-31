@@ -12,6 +12,7 @@ import { SwapRoutes } from '../modules/swap/swap.routes';
 import { RattingRoutes } from '../modules/rattings/rattings.routes';
 import { MessageRoutes } from '../modules/messages/message.routes';
 import { NotificationRoutes } from '../modules/notifications/notifications.routes';
+import { PaymentRoutes } from '../modules/payment/payment.routes';
 
 const router = express.Router();
 
@@ -71,15 +72,21 @@ const moduleRoutes = [
     path: '/review',
     route: RattingRoutes,
   },
-  // -- progressing
+  // -- done
   {
     path: '/message',
     route: MessageRoutes,
   },
+    // -- progressing
   {
     path: '/notification',
     route: NotificationRoutes,
   },
+     // -- progressing
+  {
+    path:"/payment",
+    route: PaymentRoutes,
+  }
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));
 

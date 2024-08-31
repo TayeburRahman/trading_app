@@ -7,6 +7,7 @@ import { SubCategory } from '../sub-category/sub-category.model';
 import User from '../auth/auth.model';
 import QueryBuilder from '../../../builder/QueryBuilder';
 import { Request } from 'express';
+import Notification from '../notifications/notifications.model';
 
 const insertIntoDB = async (
   files: any,
@@ -37,7 +38,24 @@ const insertIntoDB = async (
     payload.images = images;
   }
   payload.user = user.userId;
-  return await Product.create(payload);
+
+  const result = await Product.create(payload);
+
+  const notificationMessage = `You successfully post your add!`;
+  const notification = await Notification.create({
+    title:  'View for more details.', 
+    user: user.userId,
+    product: result?._id,
+    message: notificationMessage,
+  });
+
+  //@ts-ignore
+  const socketIo = global.io;
+  if (socketIo) {
+    socketIo.emit(`notification::${notification?._id.toString()}`, notification); 
+  } 
+  
+  return result;
 };
 
 const products = async (query: Record<string, unknown>) => {

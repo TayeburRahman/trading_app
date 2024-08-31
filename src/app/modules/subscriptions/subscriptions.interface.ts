@@ -1,5 +1,5 @@
 export type ISubscriptions = {
-  planName: 'Platinum' | 'Gold' | 'Diamond';
+  planName: 'Platinum' | 'Gold' | 'Diamond' | "Trial";
   fee: number;
   pointRangeStart: number;
   pointRangeEnd: number;

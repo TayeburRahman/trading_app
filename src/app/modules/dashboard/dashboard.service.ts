@@ -74,37 +74,27 @@ const getMonthlySubscriptionGrowth = async (year?: number) => {
     ]);
 
     const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ];
 
-    const result = [];
-    for (let i = 1; i <= 12; i++) {
+    const result = Array.from({ length: 12 }, (_, i) => {
       const monthData = monthlySubscriptionGrowth.find(
-        data => data.month === i,
-      ) || { month: i, count: 0, year: selectedYear };
-      result.push({
+        data => data.month === i + 1
+      ) || { month: i + 1, count: 0, year: selectedYear };
+      return {
         ...monthData,
-        month: months[i - 1],
-      });
-    }
+        month: months[i],
+      };
+    });
 
     return {
       year: selectedYear,
       data: result,
     };
   } catch (error) {
-    logger.error('Error in getMonthlySubscriptionGrowth function: ', error);
+    // Assuming logger is properly imported or defined elsewhere
+    console.error('Error in getMonthlySubscriptionGrowth function: ', error);
     throw error;
   }
 };
