@@ -156,9 +156,9 @@ const deleteMyAccount = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const blockUser = catchAsync(async (req: Request, res: Response) => {
+const block_unblockUser = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
-  const result = await AuthService.blockUser(id);
+  const result = await AuthService.block_unblockUser(id);
   sendResponse<IUser>(res, {
     statusCode: 200,
     success: true,
@@ -180,5 +180,5 @@ export const AuthController = {
   deleteMyAccount,
   checkIsValidForgetActivationCode,
   resendActivationCode,
-  blockUser,
+  block_unblockUser,
 };

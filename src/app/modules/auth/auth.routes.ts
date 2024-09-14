@@ -50,9 +50,9 @@ router.get(
 );
 
 router.patch(
-  '/user-block/:id',
+  '/user-block-unblock/:id',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-  AuthController.blockUser,
+  AuthController.block_unblockUser,
 );
 
 //! Admin Authentication Start
@@ -74,6 +74,5 @@ router.get(
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   AdminController.getAllAdmin,
 );
- 
 
 export const AuthRoutes = router;

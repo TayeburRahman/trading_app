@@ -32,7 +32,7 @@ export type IReqUser = {
 };
 
 export type Ireting = {
-  userId: string; 
+  userId: string;
 };
 
 export type IUser = {
@@ -46,32 +46,6 @@ export type IUser = {
   role: 'ADMIN' | 'SUPER_ADMIN' | 'USER';
   profile_image: string;
   cover_image: string;
-  date_of_birth: Date;
-  place_of_birth: string;
-  license_number: string;
-  passport_number: string;
-  profession: string;
-  region: string;
-  haveChildren: string;
-  havePets: string;
-  haveVehicle: string;
-  willingVehicle: string;
-  ownerOfProperty: string;
-  ableApproveForm: string;
-  propertyInsured: string;
-  utilitiesUptoDate: string;
-  aboutSwap: string;
-  departureArrival: string;
-  travelStartDestination: string;
-  travelEndDestination: string;
-  travelStartState: string;
-  travelEndState: string;
-  travelStartCounty: string;
-  travelEndCounty: string;
-  travelStartCountry: string;
-  travelEndCountry: string;
-  purposeOfTravel: string;
-  datesOfTravel: Date;
   gender: 'male' | 'female' | 'others' | '';
   isSubscribed: boolean;
   is_block: boolean;

@@ -5,7 +5,7 @@ import sendResponse from '../../../shared/sendResponse';
 import { ICategory } from './category.interface';
 
 const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
-  console.log('==========', req.body, res.files);
+  // console.log('==========', req.body, res.files);
   const result = await categoryService.insertIntoDB(req.files, req.body);
   sendResponse<ICategory>(res, {
     statusCode: 200,

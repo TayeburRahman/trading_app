@@ -47,11 +47,11 @@ const registrationUser = async (payload: IRegistration) => {
   const isEmailExist = await User.findOne({ email });
   if (isEmailExist) {
     throw new ApiError(400, 'Email already exist');
-  } 
-  
+  }
+
   const activationToken = createActivationToken();
 
-  console.log("activationToken", activationToken)
+  console.log('activationToken', activationToken);
 
   const activationCode = activationToken.activationCode;
   const data = { user: { name: user.name }, activationCode };
@@ -439,7 +439,7 @@ const resetPassword = async (payload: {
   await user.save();
 };
 
-const blockUser = async (id: string): Promise<IUser | null> => {
+const block_unblockUser = async (id: string): Promise<IUser | null> => {
   const isUserExist = await User.findById(id);
   if (!isUserExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No User Found');
@@ -466,5 +466,5 @@ export const AuthService = {
   deleteMyAccount,
   checkIsValidForgetActivationCode,
   resendActivationCode,
-  blockUser,
+  block_unblockUser,
 };

@@ -6,7 +6,7 @@ import { SubscriptionsRoutes } from '../modules/subscriptions/subscriptions.rout
 import { AddsRoutes } from '../modules/media/media.routes';
 import { ManageRoutes } from '../modules/settings/settings.routes';
 import { DashboardRoutes } from '../modules/dashboard/dashboard.routes';
-import { UpgradePlanRoutes } from '../modules/upgrade-plan/upgrade-plan.routes';
+import { UpgradePlanRoutes } from '../modules/user-subscription/user-plan.routes';
 import { ProductRoutes } from '../modules/products/products.routes';
 import { SwapRoutes } from '../modules/swap/swap.routes';
 import { RattingRoutes } from '../modules/rattings/rattings.routes';
@@ -22,27 +22,27 @@ const moduleRoutes = [
     path: '/auth',
     route: AuthRoutes,
   },
-   // -- done
+  // -- done
   {
     path: '/category',
     route: CategoryRoutes,
   },
-   // -- done
+  // -- done
   {
     path: '/sub-category',
     route: SubCategoryRoutes,
   },
-    // -- done
+  // -- done
   {
     path: '/subscription',
     route: SubscriptionsRoutes,
   },
-     // -- done
+  // -- done
   {
     path: '/adds',
     route: AddsRoutes,
   },
-    // -- done
+  // -- done
   {
     path: '/rules',
     route: ManageRoutes,
@@ -52,22 +52,22 @@ const moduleRoutes = [
     path: '/dashboard',
     route: DashboardRoutes,
   },
-      // -- done
+  // -- done
   {
     path: '/plan',
     route: UpgradePlanRoutes,
   },
-    // -- done
+  // -- done
   {
     path: '/product',
     route: ProductRoutes,
   },
-    // -- done
+  // -- done
   {
     path: '/swap',
     route: SwapRoutes,
   },
-    // -- done
+  // -- done
   {
     path: '/review',
     route: RattingRoutes,
@@ -77,16 +77,16 @@ const moduleRoutes = [
     path: '/message',
     route: MessageRoutes,
   },
-    // -- progressing
+  // -- progressing
   {
     path: '/notification',
     route: NotificationRoutes,
   },
-     // -- progressing
+  // -- progressing
   {
-    path:"/payment",
+    path: '/payment',
     route: PaymentRoutes,
-  }
+  },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));
 

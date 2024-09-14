@@ -2,7 +2,7 @@ import { logger } from '../../../shared/logger';
 import User from '../auth/auth.model';
 import Notification from '../notifications/notifications.model';
 import { Subscription } from '../subscriptions/subscriptions.model';
-import { Plan } from '../upgrade-plan/upgrade-plan.model';
+import { Plan } from '../user-subscription/user-plan.model';
 
 const getYearRange = (year: any) => {
   const startDate = new Date(`${year}-01-01`);
@@ -74,13 +74,23 @@ const getMonthlySubscriptionGrowth = async (year?: number) => {
     ]);
 
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
 
     const result = Array.from({ length: 12 }, (_, i) => {
       const monthData = monthlySubscriptionGrowth.find(
-        data => data.month === i + 1
+        data => data.month === i + 1,
       ) || { month: i + 1, count: 0, year: selectedYear };
       return {
         ...monthData,
@@ -185,7 +195,6 @@ const getMonthlyUserGrowth = async (year?: number) => {
 };
 
 const approveUser = async (userId: string) => {
- 
   try {
     const user = await User.findById(userId);
     if (!user) {
@@ -194,25 +203,27 @@ const approveUser = async (userId: string) => {
     user.isApproved = true;
     await user.save();
 
-     const notificationMessage = `Your application is approved successfully.`;
-     const notification = await Notification.create({
-       title: 'Your successfully registered!', 
-       user: userId,
-       message: notificationMessage,
-     });
+    const notificationMessage = `Your application is approved successfully.`;
+    const notification = await Notification.create({
+      title: 'Your successfully registered!',
+      user: userId,
+      message: notificationMessage,
+    });
 
-     //@ts-ignore
-     const socketIo = global.io;
-     if (socketIo) {
-       socketIo.emit(`notification::${notification?._id.toString()}`, notification); 
-     }  
+    //@ts-ignore
+    const socketIo = global.io;
+    if (socketIo) {
+      socketIo.emit(
+        `notification::${notification?._id.toString()}`,
+        notification,
+      );
+    }
 
     return user;
   } catch (error) {
     logger.error('Error in approveUser function: ', error);
     throw error;
   }
-  
 };
 
 const rejectUser = async (userId: string) => {

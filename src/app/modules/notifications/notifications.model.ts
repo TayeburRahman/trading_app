@@ -7,6 +7,9 @@ const notificationSchema = new Schema<INotification>(
       type: Schema.Types.ObjectId,
       ref: 'User',
     },
+    admin: {
+      type: Boolean,
+    },
     title: {
       type: String,
       required: true,

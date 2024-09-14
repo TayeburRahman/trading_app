@@ -5,16 +5,19 @@ import { IReqUser } from '../auth/auth.interface';
 
 //Get
 const getNotifications = async () => {
-  const allNotification = await Notification.find().sort({ createdAt: -1 });
-  const unreadNotification = await Notification.countDocuments({
-    status: false,
+  const allNotification = await Notification.find({ admin: true }).sort({
+    createdAt: -1,
   });
-  
-  const readNotification = await Notification.countDocuments({ status: true });
   return {
     allNotification,
-    unreadNotification,
-    readNotification,
+  };
+};
+
+const deleteNotifications = async (req: Request) => {
+  const id = req.params.id;
+  const allNotification = await Notification.deleteOne({ _id: id });
+  return {
+    allNotification,
   };
 };
 
@@ -53,4 +56,5 @@ export const NotificationService = {
   updateNotification,
   myNotification,
   updateAll,
+  deleteNotifications,
 };

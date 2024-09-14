@@ -53,9 +53,22 @@ const myNotification: RequestHandler = catchAsync(
   },
 );
 
+const deleteNotifications: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await NotificationService.deleteNotifications(req);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: `Notification delete successfully`,
+      data: result,
+    });
+  },
+);
+
 export const NotificationController = {
   getNotifications,
   updateNotification,
   myNotification,
   updateAll,
+  deleteNotifications,
 };
