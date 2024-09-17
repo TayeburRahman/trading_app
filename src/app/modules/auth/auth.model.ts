@@ -51,7 +51,6 @@ const UserSchema = new Schema<IUser, UserModel>(
       type: String,
       enum: ['Male', 'Female', 'Others'],
     },
-
     profile_image: {
       type: String,
       default:
