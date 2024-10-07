@@ -73,6 +73,9 @@ const subscriptionSchema = new Schema<IUpgradePlan>(
     region: {
       type: String,
     },
+    religion: {
+      type: String,
+    },
     haveChildren: {
       type: String,
     },

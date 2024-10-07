@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import ApiError from '../../../errors/ApiError';
-import { IRegistration } from '../auth/auth.interface';
+import { IRegistration, IReqUser } from '../auth/auth.interface';
 import User from '../auth/auth.model';
 
 //!
@@ -28,7 +28,40 @@ const getAllAdmin = async () => {
   return results;
 };
 
+const getMyProfile = async (req: Request) => {
+  //@ts-ignore
+  const { userId } = req.user as IReqUser;
+
+  if (!userId) {
+    throw new ApiError(401, 'User not authenticated');
+  }
+  const result = await User.findById(userId);
+
+  if (!result) {
+    throw new ApiError(404, 'Profile not found');
+  }
+
+  return result;
+};
+
+const getUserProfile = async (req: any) => {
+  const { userId } = req.params;
+
+  if (!userId) {
+    throw new ApiError(401, 'User not authenticated');
+  }
+  const result = await User.findById(userId);
+
+  if (!result) {
+    throw new ApiError(404, 'Profile not found');
+  }
+
+  return result;
+};
+
 export const AdminService = {
   registerAdmin,
   getAllAdmin,
+  getMyProfile,
+  getUserProfile,
 };

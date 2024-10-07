@@ -26,7 +26,30 @@ const getAllAdmin = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMyProfile = catchAsync(async (req: Request, res: Response) => {
+  //@ts-ignore
+  const result = await AdminService.getMyProfile(req);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'successful!',
+    data: result,
+  });
+});
+
+const getUserProfile = catchAsync(async (req: Request, res: Response) => {
+  const result = await AdminService.getUserProfile(req);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'successful!',
+    data: result,
+  });
+});
+
 export const AdminController = {
   registerAdmin,
   getAllAdmin,
+  getMyProfile,
+  getUserProfile,
 };

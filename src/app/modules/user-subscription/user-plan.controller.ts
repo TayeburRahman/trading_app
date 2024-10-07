@@ -33,6 +33,16 @@ const AllSubscriber = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getSubscribeData = catchAsync(async (req: Request, res: Response) => {
+  const result = await UpgradePlanService.getSubscribeData(req.params);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Plan retrieved successful',
+    data: result,
+  });
+});
+
 const statusUpdateRequest = catchAsync(async (req: Request, res: Response) => {
   const result = await UpgradePlanService.statusUpdateRequest(req);
   sendResponse(res, {
@@ -59,4 +69,5 @@ export const UpgradePlanController = {
   mySubscription,
   createSubscription,
   statusUpdateRequest,
+  getSubscribeData,
 };

@@ -44,4 +44,5 @@ export type IUpgradePlan = {
   endCounty: string;
   endCountry: string;
   purposeOfTravel: string;
+  religion: string;
 };

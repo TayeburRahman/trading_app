@@ -304,26 +304,10 @@ const changePassword = async (
 
 //!
 const forgotPass = async (payload: { email: string }) => {
-  const user = (await User.findOne(
-    { email: payload.email },
-    { _id: 1, role: 1 },
-  )) as IUser;
+  const user = (await User.findOne({ email: payload.email })) as IUser;
 
   if (!user) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'User does not exist!');
-  }
-
-  let profile = null;
-  if (user.role === ENUM_USER_ROLE.USER) {
-    profile = await User.findOne({ _id: user?._id });
-  }
-
-  if (!profile) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Pofile not found!');
-  }
-
-  if (!profile.email) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Email not found!');
   }
 
   const activationCode = forgetActivationCode();
@@ -333,10 +317,10 @@ const forgotPass = async (payload: { email: string }) => {
   await user.save();
 
   sendResetEmail(
-    profile.email,
+    user.email,
     `
       <div>
-        <p>Hi, ${profile.name}</p>
+        <p>Hi, ${user.name}</p>
         <p>Your password reset Code: ${activationCode}</p>
         <p>Thank you</p>
       </div>

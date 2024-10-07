@@ -18,7 +18,7 @@ const createSubscription = async (req: Request) => {
     throw new ApiError(404, 'User not found');
   }
 
-  const subscriptionPlan = await Subscription.findById(data.planId);
+  const subscriptionPlan = await Subscription.findById(data.plan_id);
 
   if (!subscriptionPlan) {
     throw new ApiError(404, 'Plan not found');
@@ -90,6 +90,11 @@ const AllSubscriber = async (query: Record<string, unknown>) => {
   };
 };
 
+const getSubscribeData = async (params: Record<string, unknown>) => {
+  const subscriptionsQuery = await Plan.findById(params.id).populate('user_id');
+  return subscriptionsQuery;
+};
+
 const statusUpdateRequest = async (req: Request) => {
   const { id } = req.params;
   const { status } = req.query;
@@ -136,4 +141,5 @@ export const UpgradePlanService = {
   mySubscription,
   createSubscription,
   statusUpdateRequest,
+  getSubscribeData,
 };
