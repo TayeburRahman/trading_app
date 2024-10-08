@@ -8,7 +8,7 @@ const UserSchema = new Schema<IUser, UserModel>(
   {
     name: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     email: {
@@ -53,13 +53,11 @@ const UserSchema = new Schema<IUser, UserModel>(
     },
     profile_image: {
       type: String,
-      default:
-        'https://png.pngtree.com/png-clipart/20230513/ourmid/pngtree-smile-dog-on-white-background-png-image_7096061.png',
+      default: 'https://i.ibb.co.com/sF7KDj5/profile.jpg',
     },
     cover_image: {
       type: String,
-      default:
-        'https://images.unsplash.com/photo-1504805572947-34fad45aed93?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y292ZXIlMjBwaG90b3xlbnwwfHwwfHx8MA%3D%3D',
+      default: 'https://i.ibb.co.com/mCxGBqX/backround.jpg',
     },
     isPaid: {
       type: Boolean,

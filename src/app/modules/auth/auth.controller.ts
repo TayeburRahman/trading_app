@@ -158,11 +158,11 @@ const deleteMyAccount = catchAsync(async (req: Request, res: Response) => {
 
 const block_unblockUser = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
-  const result = await AuthService.block_unblockUser(id);
+  const result: any = await AuthService.block_unblockUser(id);
   sendResponse<IUser>(res, {
     statusCode: 200,
     success: true,
-    message: 'User Blocked successfully',
+    message: `User ${result.is_block ? 'Blocked' : 'Unblocked'} successfully`,
     data: result,
   });
 });

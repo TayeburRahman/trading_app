@@ -45,4 +45,5 @@ export type IUpgradePlan = {
   endCountry: string;
   purposeOfTravel: string;
   religion: string;
+  declineReason: string;
 };

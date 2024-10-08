@@ -28,7 +28,7 @@ router.delete(
 );
 router.patch(
   '/change-password',
-  auth(ENUM_USER_ROLE.USER),
+  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
   AuthController.changePassword,
 );
 router.post('/forgot-password', AuthController.forgotPass);

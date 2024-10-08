@@ -25,7 +25,7 @@ router.patch(
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   NotificationController.updateNotification,
 );
-router.get(
+router.delete(
   '/delete/:id',
   auth(ENUM_USER_ROLE.ADMIN),
   NotificationController.deleteNotifications,

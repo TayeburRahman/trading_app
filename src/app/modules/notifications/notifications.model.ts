@@ -22,6 +22,10 @@ const notificationSchema = new Schema<INotification>(
       type: Boolean,
       default: false,
     },
+    plan_id: {
+      type: Schema.Types.ObjectId,
+      ref: 'Plan',
+    },
   },
   {
     timestamps: true,

@@ -25,11 +25,6 @@ const subscriptionSchema = new Schema<IUpgradePlan>(
       type: Date,
       required: true,
     },
-    payment_status: {
-      type: String,
-      required: true,
-      enum: ['paid', 'unpaid', 'trial'],
-    },
     plan_type: {
       type: String,
       enum: ['Trial', 'Gold', 'Premium', 'Platinum'],
@@ -38,10 +33,7 @@ const subscriptionSchema = new Schema<IUpgradePlan>(
     status: {
       type: String,
       default: 'padding',
-      enum: ['padding', 'decline', 'approved'],
-    },
-    transactionId: {
-      type: String,
+      enum: ['padding', 'resubmit', 'decline', 'approved'],
     },
     orderId: {
       type: String,
@@ -135,6 +127,17 @@ const subscriptionSchema = new Schema<IUpgradePlan>(
     },
     purposeOfTravel: {
       type: String,
+    },
+    declineReason: {
+      type: String,
+    },
+    transactionId: {
+      type: String,
+    },
+    payment_status: {
+      type: String,
+      required: true,
+      enum: ['paid', 'unpaid', 'trial'],
     },
   },
   {

@@ -8,6 +8,7 @@ import { Plan } from './user-plan.model';
 import QueryBuilder from '../../../builder/QueryBuilder';
 import { IReqUser } from '../auth/auth.interface';
 import Notification from '../notifications/notifications.model';
+import { IUpgradePlan } from './user-plan.interface';
 
 const createSubscription = async (req: Request) => {
   let data = req.body;
@@ -38,8 +39,15 @@ const createSubscription = async (req: Request) => {
 
   const notification = await Notification.create({
     user: checkUser?._id,
-    title: 'Unlock New Subscription Plan',
-    message: `Unlock New Plan From ${checkUser?.name} on ${subscriptionPlan?.planName} Subscription.`,
+    title: 'Subscription Plan Request!',
+    message: `Request Unlock New Plan From ${checkUser?.name} on ${subscriptionPlan?.planName} Subscription Successful.`,
+  });
+
+  await Notification.create({
+    admin: true,
+    plan_id: subscription._id,
+    title: 'New user applied!',
+    message: `A new user has applied for ${subscriptionPlan?.planName} membership packages and waiting for approval, review the application for approval.`,
   });
 
   //@ts-ignore
@@ -70,7 +78,7 @@ const updateSubscription = async (req: Request) => {
 
 const AllSubscriber = async (query: Record<string, unknown>) => {
   const subscriptionsQuery = new QueryBuilder(
-    Plan.find().populate('user_id'),
+    Plan.find({ status: { $ne: 'decline' } }).populate('user_id'),
     query,
   )
     .search(['plan_type'])
@@ -98,6 +106,7 @@ const getSubscribeData = async (params: Record<string, unknown>) => {
 const statusUpdateRequest = async (req: Request) => {
   const { id } = req.params;
   const { status } = req.query;
+  const { reason } = req.body;
 
   if (
     !id ||
@@ -107,9 +116,45 @@ const statusUpdateRequest = async (req: Request) => {
     throw new ApiError(400, 'Invalid ID or status');
   }
 
+  const plan: any = await Plan.findById(id).populate('plan_id');
+
+  if (status === 'decline') {
+    if (!reason) {
+      throw new ApiError(400, 'Reason is required!');
+    }
+
+    const notification = await Notification.create({
+      title: 'Subscription Application Declined.',
+      user: plan.user_id,
+      plan_id: plan._id,
+      message: `We regret to inform you that your application has been declined. Reason: ${reason}. Please correct your information and resubmit.`,
+    });
+
+    //@ts-ignore
+    const socketIo = global.io;
+    if (socketIo) {
+      socketIo.emit(`notification::${plan.user_id.toString()}`, notification);
+    }
+  }
+
+  if (status === 'approved') {
+    const notification = await Notification.create({
+      title: 'Subscription Application Update.',
+      user: plan.user_id,
+      plan_id: plan._id,
+      message: `Your subscription application has been approved. Please complete your payment ${plan.plan_id.fee} to activate your plan.`,
+    });
+
+    //@ts-ignore
+    const socketIo = global.io;
+    if (socketIo) {
+      socketIo.emit(`notification::${plan.user_id.toString()}`, notification);
+    }
+  }
+
   const updatedPlan = await Plan.findByIdAndUpdate(
     id,
-    { status },
+    { status, declineReason: reason },
     { new: true, runValidators: true },
   );
 

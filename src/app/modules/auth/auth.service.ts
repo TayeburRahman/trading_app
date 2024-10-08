@@ -41,6 +41,7 @@ const registrationUser = async (payload: IRegistration) => {
     role,
     expirationTime: Date.now() + 2 * 60 * 1000,
   } as unknown as IUser;
+
   if (password !== confirmPassword) {
     throw new ApiError(400, "Password and ConfirmPassword didn't match");
   }
@@ -245,7 +246,7 @@ const loginUser = async (payload: any) => {
   );
 
   return {
-    // id: checkUser?._id,
+    user: checkUser,
     conversationId: checkUser?.conversationId,
     // isPaid: checkUser?.isPaid,
     accessToken,
