@@ -20,13 +20,25 @@ router.get(
 
 router.get(
   '/get-all',
-  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.USER),
+  // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.USER),
   ProductController.products,
 );
 
 router.get(
-  '/details/:id',
+  '/get-top-products',
+  // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.USER),
+  ProductController.topProducts,
+);
+
+router.get(
+  '/just-for-you',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.USER),
+  ProductController.productJustForYou,
+);
+
+router.get(
+  '/details/:id',
+  // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.USER),
   ProductController.singleProduct,
 );
 

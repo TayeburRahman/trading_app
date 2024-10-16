@@ -13,7 +13,7 @@ router.post(
 
 router.get(
   '/all',
-  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.USER),
+  // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.USER),
   SubscriptionController.subscriptions,
 );
 
@@ -28,5 +28,7 @@ router.delete(
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   SubscriptionController.deleteSubscription,
 );
+
+router.get('/details/:id', SubscriptionController.subscriptionDetails);
 
 export const SubscriptionsRoutes = router;

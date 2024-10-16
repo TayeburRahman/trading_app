@@ -24,14 +24,15 @@ const createSubscription = async (req: Request) => {
   if (!subscriptionPlan) {
     throw new ApiError(404, 'Plan not found');
   }
-
-  checkUser.isSubscribed = true;
+  
 
   const startDate = new Date();
   const endDate = new Date(
     startDate.getTime() + subscriptionPlan.duration * 24 * 60 * 60 * 1000,
   );
+  data.planStartDate = startDate;
   data.planEndDate = endDate;
+  data.user_id = req?.user?.userId;
 
   const subscription = await Plan.create(data);
 
@@ -167,13 +168,14 @@ const statusUpdateRequest = async (req: Request) => {
 
 const mySubscription = async (req: Request) => {
   const { userId } = req.user as IReqUser;
+
   const isExistUser = await User.findById(userId);
+
   if (!isExistUser) {
     throw new ApiError(404, 'User not found');
   }
-  const subscription = await Subscription.findOne({ user_id: userId }).sort({
-    createdAt: -1,
-  });
+  const subscription = await Plan.findOne({ user_id: userId });
+
   if (!subscription) {
     return null;
   }

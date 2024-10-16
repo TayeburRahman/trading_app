@@ -8,7 +8,7 @@ const insertIntoDB = async (payload: ISubscriptions) => {
 };
 
 const subscriptions = async () => {
-  return await Subscription.find();
+  return await Subscription.find().sort({ pointRangeStart: 1 });
 };
 
 const updateSubscription = async (req: Request) => {
@@ -40,9 +40,20 @@ const deleteSubscription = async (id: string) => {
   }
   return await Subscription.findByIdAndDelete(id);
 };
+
+const subscriptionDetails = async (id: string) => {
+  const isExist = (await Subscription.findOne({ _id: id })) as ISubscriptions;
+
+  if (!isExist) {
+    throw new ApiError(404, 'Subscription not found !');
+  }
+  return isExist;
+};
+
 export const SubscriptionService = {
   insertIntoDB,
   subscriptions,
   updateSubscription,
   deleteSubscription,
+  subscriptionDetails,
 };

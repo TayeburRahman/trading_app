@@ -8,12 +8,13 @@ import User from '../auth/auth.model';
 import QueryBuilder from '../../../builder/QueryBuilder';
 import { Request } from 'express';
 import Notification from '../notifications/notifications.model';
+import { IUser } from '../auth/auth.interface';
 
 const insertIntoDB = async (
   files: any,
   payload: IProducts,
   user: JwtPayload,
-) => { 
+) => {
   if (!files?.product_img) {
     throw new ApiError(400, 'File is missing');
   }
@@ -43,7 +44,7 @@ const insertIntoDB = async (
 
   const notificationMessage = `You successfully post your add!`;
   const notification = await Notification.create({
-    title:  'View for more details.', 
+    title: 'View for more details.',
     user: user.userId,
     product: result?._id,
     message: notificationMessage,
@@ -52,9 +53,12 @@ const insertIntoDB = async (
   //@ts-ignore
   const socketIo = global.io;
   if (socketIo) {
-    socketIo.emit(`notification::${notification?._id.toString()}`, notification); 
-  } 
-  
+    socketIo.emit(
+      `notification::${notification?._id.toString()}`,
+      notification,
+    );
+  }
+
   return result;
 };
 
@@ -64,7 +68,7 @@ const products = async (query: Record<string, unknown>) => {
     .filter()
     .sort()
     .paginate()
-    .fields(); 
+    .fields();
   const result = await categoryQuery.modelQuery;
   const meta = await categoryQuery.countTotal();
 
@@ -148,7 +152,7 @@ const singleProduct = async (id: string) => {
   ]);
 
   const similarProduct = await Product.find({
-    subCategory: result?.subCategory
+    subCategory: result?.subCategory,
   });
   return { product: result, similarProduct };
 };
@@ -156,10 +160,39 @@ const singleProduct = async (id: string) => {
 const productForSwap = async (req: Request) => {
   const user = req.user as JwtPayload;
   const { productId } = req.params;
-  
+
   return await Product.findOne({
     $and: [{ user: user.userId }, { _id: productId }],
   });
+};
+
+const topProducts = async (req: Request) => {
+  const users = await User.find().sort({ points: -1 });
+
+  const userIds = users.map(user => user._id);
+
+  const products = await Product.find({ user: { $in: userIds } }).sort({
+    productValue: -1,
+  });
+
+  return products;
+};
+
+const productJustForYou = async (req: Request) => {
+  const { userId } = req.user as JwtPayload;
+
+  const user = (await User.findById(userId)) as IUser;
+  const role = user?.role;
+
+  const users = await User.find({ role: role });
+
+  const userIds = users.map(user => user._id);
+
+  const products = await Product.find({ user: { $in: userIds } }).sort({
+    productValue: -1,
+  });
+
+  return products;
 };
 
 export const ProductService = {
@@ -170,4 +203,6 @@ export const ProductService = {
   deleteProduct,
   singleProduct,
   productForSwap,
+  topProducts,
+  productJustForYou,
 };

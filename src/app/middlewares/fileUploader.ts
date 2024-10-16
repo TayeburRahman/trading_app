@@ -5,8 +5,8 @@ import multer from 'multer';
 export const uploadFile = () => {
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      let uploadPath = ''; 
- 
+      let uploadPath = '';
+
       if (
         file.fieldname === 'cover_image' ||
         file.fieldname === 'profile_image'
@@ -15,7 +15,7 @@ export const uploadFile = () => {
       } else if (file.fieldname === 'product_img') {
         uploadPath = 'uploads/images/products';
       } else if (file.fieldname === 'image') {
-        uploadPath = 'uploads/images/catagorys';
+        uploadPath = 'uploads/images/image';
       } else if (file.fieldname === 'message_img') {
         uploadPath = 'uploads/images/message';
       } else if (file.fieldname === 'video') {
@@ -28,7 +28,7 @@ export const uploadFile = () => {
         file.mimetype === 'image/jpeg' ||
         file.mimetype === 'image/png' ||
         file.mimetype === 'image/jpg' ||
-        file.mimetype === 'image/webp' ||
+        // file.mimetype === 'image/webp' ||
         file.mimetype === 'video/mp4'
       ) {
         cb(null, uploadPath);
@@ -48,11 +48,11 @@ export const uploadFile = () => {
       'image',
       'profile_image',
       'cover_image',
-      "product_img",
+      'product_img',
       'video',
       'thumbnail',
       'video_thumbnail',
-      'message_img'
+      'message_img',
     ];
 
     if (file.fieldname === undefined) {
@@ -79,7 +79,7 @@ export const uploadFile = () => {
     fileFilter: fileFilter,
   }).fields([
     { name: 'image', maxCount: 30 },
-    {name:"product_img", maxCount: 10 },
+    { name: 'product_img', maxCount: 10 },
     { name: 'cover_image', maxCount: 1 },
     { name: 'profile_image', maxCount: 1 },
     { name: 'video', maxCount: 1 },

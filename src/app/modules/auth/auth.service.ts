@@ -28,11 +28,10 @@ import {
 import User from './auth.model';
 import { userSearchableField } from './auth.constants';
 
-//!
-//!
 const registrationUser = async (payload: IRegistration) => {
   const { name, email, password, phone_number, role, confirmPassword } =
     payload;
+
   const user = {
     name,
     email,
@@ -312,7 +311,7 @@ const forgotPass = async (payload: { email: string }) => {
   }
 
   const activationCode = forgetActivationCode();
-  const expiryTime = new Date(Date.now() + 15 * 60 * 1000);
+  const expiryTime = new Date(Date.now() + 3 * 60 * 1000);
   user.verifyCode = activationCode;
   user.verifyExpire = expiryTime;
   await user.save();
@@ -369,6 +368,30 @@ const resendActivationCode = async (payload: { email: string }) => {
   );
 };
 //!
+
+// Code verify - done
+cron.schedule('* * * * *', async () => {
+  try {
+    const now = new Date();
+    const result = await User.updateMany(
+      {
+        isActive: false,
+        verifyExpire: { $lte: now },
+      },
+      {
+        $unset: { codeVerify: false },
+      },
+    );
+
+    if (result.modifiedCount > 0) {
+      logger.info(
+        `Removed activation codes from ${result.modifiedCount} expired inactive users`,
+      );
+    }
+  } catch (error) {
+    logger.error('Error removing activation codes from expired users:', error);
+  }
+});
 const forgetActivationCode = () => {
   const activationCode = Math.floor(100000 + Math.random() * 900000).toString();
   return activationCode;
@@ -402,6 +425,8 @@ const resetPassword = async (payload: {
   confirmPassword: string;
 }) => {
   const { email, newPassword, confirmPassword } = payload;
+
+  console.log('===', newPassword, confirmPassword);
   if (newPassword !== confirmPassword) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Password didn't match");
   }

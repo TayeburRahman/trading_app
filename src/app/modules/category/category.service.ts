@@ -8,7 +8,7 @@ import { Category } from './category.model';
 const insertIntoDB = async (files: any, payload: ICategory) => {
   if (!files?.image) {
     throw new ApiError(400, 'File is missing');
-  } 
+  }
 
   const checkIsExist = await Category.findOne({ name: payload.name });
 
@@ -22,30 +22,25 @@ const insertIntoDB = async (files: any, payload: ICategory) => {
 };
 
 const categories = async (query: Record<string, unknown>) => {
-  const categoryQuery = new QueryBuilder(Category.find(), query)
-    .search([])
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
-
-  const result = await categoryQuery.modelQuery;
-  const meta = await categoryQuery.countTotal();
-
+  const result = await Category.find();
   return {
-    meta,
     data: result,
   };
 };
 
 const updateCategory = async (req: Request) => {
   const { files } = req as any;
-  const id = req.params.id;
+  const id = req.params.id; 
   let image = undefined;
+  const name = req.body.name;
+
+  if(!name){
+    throw new ApiError(400, 'Category name is required');
+  }
 
   if (files && files.image) {
     image = `/images/image/${files.image[0].filename}`;
-  }
+  } 
 
   const isExist = await Category.findOne({ _id: id });
 
@@ -55,7 +50,7 @@ const updateCategory = async (req: Request) => {
 
   const { ...categoryData } = req.body;
 
-  const updatedData: Partial<ICategory> = { ...categoryData };
+  const updatedData: Partial<ICategory> = { ...categoryData }; 
 
   const result = await Category.findOneAndUpdate(
     { _id: id },

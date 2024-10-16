@@ -84,6 +84,26 @@ const singleProduct = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const topProducts = catchAsync(async (req: Request, res: Response) => {
+  const result = await ProductService.topProducts(req);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Product get successfully',
+    data: result,
+  });
+});
+
+const productJustForYou = catchAsync(async (req: Request, res: Response) => {
+  const result = await ProductService.productJustForYou(req);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Product get successfully',
+    data: result,
+  });
+});
+
 export const ProductController = {
   insertIntoDB,
   products,
@@ -92,4 +112,6 @@ export const ProductController = {
   deleteProduct,
   productForSwap,
   singleProduct,
+  topProducts,
+  productJustForYou,
 };

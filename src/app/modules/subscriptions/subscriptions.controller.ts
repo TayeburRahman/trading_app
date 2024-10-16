@@ -41,9 +41,20 @@ const subscriptions = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const subscriptionDetails = catchAsync(async (req: Request, res: Response) => {
+  const result = await SubscriptionService.subscriptionDetails(req.params.id);
+  sendResponse<ISubscriptions>(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Subscription Retrieved successfully',
+    data: result,
+  });
+});
+
 export const SubscriptionController = {
   insertIntoDB,
   subscriptions,
   updateSubscription,
   deleteSubscription,
+  subscriptionDetails,
 };

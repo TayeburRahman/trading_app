@@ -10,24 +10,31 @@ const insertIntoDB = async (payload: ISubCategory) => {
 };
 
 const categories = async (query: Record<string, unknown>) => {
-  const categoryQuery = new QueryBuilder(
-    SubCategory.find().populate('category'),
-    query,
-  )
-    .search([])
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
+  const { sub_category, category, swapLevel } = query;
 
-  const result = await categoryQuery.modelQuery;
-  const meta = await categoryQuery.countTotal();
+  const queryConditions: Record<string, unknown> = {};
+  
+  if (sub_category) {
+    queryConditions.name = sub_category;
+  }
 
-  return {
-    meta,
-    data: result,
-  };
+  if (swapLevel !== undefined) {
+    queryConditions.swapLevel = swapLevel;
+  }
+
+  const result = await SubCategory.find(queryConditions)
+    .populate({
+      path: 'category',
+      match: category ? { name: category } : {},  
+
+    })
+    .exec();
+
+  // Filter out results with null categories in the final output
+  return result.filter(subCat => subCat.category !== null);
 };
+
+
 const updateCategory = async (req: Request) => {
   const id = req.params.id;
 
@@ -61,6 +68,6 @@ const deleteCategory = async (id: string) => {
 export const SubCategoryService = {
   insertIntoDB,
   categories,
-  updateCategory,
+  updateCategory, 
   deleteCategory,
 };

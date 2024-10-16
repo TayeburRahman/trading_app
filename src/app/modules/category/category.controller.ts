@@ -41,7 +41,6 @@ const categories = catchAsync(async (req: Request, res: Response) => {
     statusCode: 200,
     success: true,
     message: 'Category Retrieved successfully',
-    meta: result.meta,
     data: result.data,
   });
 });
