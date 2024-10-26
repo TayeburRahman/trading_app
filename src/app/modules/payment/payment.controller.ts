@@ -15,6 +15,22 @@ const makePaymentIntent = catchAsync(async (req: Request, res: Response) => {
   
 });
 
+const paymentSuccessAndSave = catchAsync(async (req: Request, res: Response) => {
+  const result = await PaymentService.paymentSuccessAndSave(req.body);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Save successfully',
+    data: result,
+  });
+  
+});
+
+
+ 
+
 export const PaymentController = {
   makePaymentIntent,
+  paymentSuccessAndSave
 };

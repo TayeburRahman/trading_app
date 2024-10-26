@@ -12,7 +12,7 @@ const router = express.Router();
 //!User
 router.post(
   '/register',
-  validateRequest(AuthValidation.create),
+  // validateRequest(AuthValidation.create),
   AuthController.registrationUser,
 );
 router.post('/activate-user', AuthController.activateUser);
@@ -33,7 +33,8 @@ router.patch(
 );
 router.post('/forgot-password', AuthController.forgotPass);
 router.post('/reset-password', AuthController.resetPassword);
-router.post('/resend', AuthController.resendActivationCode);
+router.post('/resend-active', AuthController.resendActivationCode);
+router.post('/resend-verify', AuthController.resendVerificationCode);
 router.post('/verify-otp', AuthController.checkIsValidForgetActivationCode);
 
 router.patch(

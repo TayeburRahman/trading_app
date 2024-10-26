@@ -29,17 +29,27 @@ import User from './auth.model';
 import { userSearchableField } from './auth.constants';
 
 const registrationUser = async (payload: IRegistration) => {
-  const { name, email, password, phone_number, role, confirmPassword } =
-    payload;
+  const { firstName, lastName, email, password, phone_number, role, confirmPassword } =
+    payload as any
+
+    if(!firstName){
+      throw new ApiError(400, "First Name is required!");
+
+    }
+
+    if(!lastName){
+      throw new ApiError(400, "Last Name is required!"); 
+    }
+ 
 
   const user = {
-    name,
+    name : String(firstName+" "+lastName),
     email,
     password,
     phone_number,
     role,
-    expirationTime: Date.now() + 2 * 60 * 1000,
-  } as unknown as IUser;
+    expirationTime: Date.now() + 5 * 60 * 1000,
+  } as unknown as IUser;  
 
   if (password !== confirmPassword) {
     throw new ApiError(400, "Password and ConfirmPassword didn't match");
@@ -49,9 +59,7 @@ const registrationUser = async (payload: IRegistration) => {
     throw new ApiError(400, 'Email already exist');
   }
 
-  const activationToken = createActivationToken();
-
-  console.log('activationToken', activationToken);
+  const activationToken = createActivationToken(); 
 
   const activationCode = activationToken.activationCode;
   const data = { user: { name: user.name }, activationCode };
@@ -85,6 +93,7 @@ const activateUser = async (payload: IActivationRequest) => {
   if (!existUser) {
     throw new ApiError(400, 'User not found');
   }
+  console.log(`Activation`, existUser.activationCode, activation_code )
   if (existUser.activationCode !== activation_code) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Code didn't match");
   }
@@ -174,6 +183,7 @@ const updateProfile = async (req: Request): Promise<IUser | null> => {
     //@ts-ignore
     profile_image = `/images/profile/${files.profile_image[0].filename}`;
   }
+
 
   //@ts-ignore
   const data = req.body;
@@ -328,7 +338,8 @@ const forgotPass = async (payload: { email: string }) => {
   );
 };
 //!
-const resendActivationCode = async (payload: { email: string }) => {
+
+const resendVerificationCode = async (payload: { email: string }) => {
   const email = payload.email;
   const user = await User.findOne({ email });
 
@@ -364,6 +375,50 @@ const resendActivationCode = async (payload: { email: string }) => {
         <p>Your password reset Code: ${activationCode}</p>
         <p>Thank you</p>
       </div>
+  `,
+  );
+};
+
+const resendActivationCode = async (payload: { email: string }) => {
+  const email = payload.email;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'User does not exist!');
+  }
+
+  let profile = null;
+  if (user.role === ENUM_USER_ROLE.USER) {
+    profile = await User.findOne({ _id: user._id });
+  }
+
+  if (!profile) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Profile not found!');
+  }
+
+  if (!profile.email) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Email not found!');
+  }
+
+  const activationCode = forgetActivationCode();
+  const expiryTime = new Date(Date.now() + 15 * 60 * 1000);
+  user.activationCode = activationCode;
+  user.verifyExpire = expiryTime;
+  await user.save();
+
+  sendResetEmail(
+    profile.email,
+    `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+      <h2 style="color: #333;">Account Activation</h2>
+      <p>Hi ${user.name},</p>
+      <p>Thank you for signing up! To activate your account, please use the following activation code:</p>
+      <h3 style="background-color: #f1f1f1; padding: 10px; border-radius: 5px; text-align: center;">
+        ${activationCode}
+      </h3>
+      <p>This code is valid for 15 minutes. If you didn't request this, please ignore this email.</p>
+      <p>Thank you!</p> 
+    </div>
   `,
   );
 };
@@ -477,4 +532,5 @@ export const AuthService = {
   checkIsValidForgetActivationCode,
   resendActivationCode,
   block_unblockUser,
+  resendVerificationCode
 };

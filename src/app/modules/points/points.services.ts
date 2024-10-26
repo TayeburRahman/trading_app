@@ -29,25 +29,63 @@ const makePoints = async (ratting: number, isPackagtes: ISubscriptions) => {
   return point;
 };
 
-const makeSwapPoints = async (product: any, planName: string) => {
-  const isPackagtes = await Subscription.findOne({ planName });
-  if (!isPackagtes) {
+const makeSwapPoints = async (product: any, userBoth: any) => {
+  const {user, toUser} = userBoth;
+
+  const isFromUserPackage = await Subscription.findOne({planName: user.userType });
+  const isToUserPackage = await Subscription.findOne({planName: toUser.userType });
+
+  console.log("======isFromUserPackage====", isFromUserPackage)
+  console.log("======isToUserPackage====", isToUserPackage)
+
+  if (!isFromUserPackage) {
+    throw new ApiError(
+      httpStatus.NOT_FOUND,
+      'Your subscription plan not found',
+    );
+  }
+
+  if (!isToUserPackage) {
+    throw new ApiError(
+      httpStatus.NOT_FOUND,
+      'To user subscription plan not found',
+    );
+  }
+
+  const fromUserPoints =
+    (Number(product.toProduct.productValue) * Number(isToUserPackage.swapPoint)) /
+    100;
+  const toUserPoints =
+    (Number(product.fromProduct.productValue) * Number( isFromUserPackage.swapPoint)) /
+    100;
+  const earnPointFromUser = Math.floor(fromUserPoints);
+  const earnPointToUser = Math.floor(toUserPoints);
+
+  console.log("======toUserPoints====", toUserPoints)
+  console.log("======fromUserPoints====", fromUserPoints)
+
+  return { earnPointFromUser, earnPointToUser };
+};
+
+const makeProductPoints = async (product: any, planName: string) => {
+ 
+
+  const isUserPackage = await Subscription.findOne({ planName });
+  if (!isUserPackage) {
     throw new ApiError(
       httpStatus.NOT_FOUND,
       'User subscription plan not found',
     );
   }
 
-  const fromUserPoints =
-    (Number(product.fromProduct.productValue) * Number(isPackagtes.swapPoint)) /
-    100;
-  const toUserPoints =
-    (Number(product.toProduct.productValue) * Number(isPackagtes.swapPoint)) /
-    100;
-  const earnPointFromUser = Math.floor(fromUserPoints);
-  const earnPointToUser = Math.floor(toUserPoints);
+  const userPoints =
+    (Number(product.productValue) * Number(isUserPackage.swapPoint)) /
+    100; 
+   
+  const earnPointUser = Math.floor(userPoints); 
 
-  return { earnPointFromUser, earnPointToUser };
+
+  return earnPointUser ;
 };
 
-export { makePoints, makeSwapPoints };
+export { makePoints, makeSwapPoints, makeProductPoints };

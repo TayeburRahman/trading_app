@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { Ireting, IUser } from '../auth/auth.interface';
+import { IUser } from '../auth/auth.interface';
 import { IProducts } from '../products/products.interface';
 
 export type ISwap = {

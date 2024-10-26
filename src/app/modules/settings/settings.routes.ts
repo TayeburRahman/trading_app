@@ -23,12 +23,10 @@ router.post(
 
 router.get(
   '/get-about-us',
-
   ManageController.getAboutUs,
 );
 router.get(
   '/get-rules',
-
   ManageController.getTermsConditions,
 );
 router.get(

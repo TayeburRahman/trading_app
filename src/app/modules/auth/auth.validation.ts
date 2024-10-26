@@ -1,15 +1,17 @@
 import { z } from 'zod';
 
-const create = z.object({
-  body: z.object({
-    name: z
+const create = z.object({ 
+  body: z.object({ 
+    firstName: z
       .string({
-        required_error: 'Name is required',
+        required_error: 'First Name is required',
       })
       .min(1, 'First name cannot be empty'),
-    phone_number: z.string({
-      required_error: 'Phone number is required',
-    }),
+    lastName: z
+      .string({
+        required_error: 'Last Name is required',
+      })
+      .min(1, 'Last name cannot be empty'),
     email: z
       .string({
         required_error: 'Email is required',
@@ -17,9 +19,11 @@ const create = z.object({
       .email('Invalid email format'),
     password: z.string({
       required_error: 'Password is required',
-    }),
+    }).min(6, 'Password must be at least 6 characters long'),
   }),
 });
+
+
 const updateUserZodSchema = z.object({
   body: z.object({
     name: z

@@ -2,7 +2,7 @@ import { Schema } from 'mongoose';
 
 type SubscriptionStatus = 'paid' | 'unpaid' | 'trial';
 type SubscriptionPlan = 'Trial' | 'Gold' | 'Platinum' | 'Diamond';
-type SubscriptionState = 'decline' | 'approved' | 'padding';
+type SubscriptionState = 'decline' | 'approved' | 'pending';
 
 export type IUpgradePlan = {
   user_id: Schema.Types.ObjectId;
@@ -46,4 +46,5 @@ export type IUpgradePlan = {
   purposeOfTravel: string;
   religion: string;
   declineReason: string;
+  active: boolean
 };

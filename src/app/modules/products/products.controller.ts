@@ -75,7 +75,7 @@ const productForSwap = catchAsync(async (req: Request, res: Response) => {
 });
 
 const singleProduct = catchAsync(async (req: Request, res: Response) => {
-  const result = await ProductService.singleProduct(req.params.id);
+  const result = await ProductService.singleProduct(req);
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -104,6 +104,18 @@ const productJustForYou = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// const swapPointCount = catchAsync(async (req: Request, res: Response) => {
+//   const result = await ProductService.swapPointCount(req);
+//   sendResponse(res, {
+//     statusCode: 200,
+//     success: true,
+//     message: 'Product point get successfully',
+//     data: result,
+//   });
+// });
+
+ 
+
 export const ProductController = {
   insertIntoDB,
   products,
@@ -114,4 +126,5 @@ export const ProductController = {
   singleProduct,
   topProducts,
   productJustForYou,
+  // swapPointCount
 };

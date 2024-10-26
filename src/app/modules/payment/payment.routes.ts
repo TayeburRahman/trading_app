@@ -10,5 +10,12 @@ router.post(
   auth(ENUM_USER_ROLE.USER),
   PaymentController.makePaymentIntent,
 );
+router.post(
+  '/success_intent',
+  auth(ENUM_USER_ROLE.USER),
+  PaymentController.paymentSuccessAndSave,
+);
+
+ 
 
 export const PaymentRoutes = router;

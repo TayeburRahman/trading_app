@@ -35,7 +35,7 @@ const productSchema = new Schema({
   },
   address: {
     type: String,
-    required: true,
+    // required: true,
   },
   images: [
     {

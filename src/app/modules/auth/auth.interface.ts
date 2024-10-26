@@ -59,6 +59,7 @@ export type IUser = {
   isApproved: boolean;
   userType: 'Gold' | 'Platinum' | 'Diamond' | 'Trial';
   conversationId: string;
+  planExpatDate: Date | any;
 };
 export type UserModel = {
   isUserExist(

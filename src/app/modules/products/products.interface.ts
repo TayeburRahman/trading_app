@@ -12,5 +12,5 @@ export type IProducts = {
   description: string;
   productValue: string;
   address: string;
-  images: []; // Here will be multiple images. array of object
+  images: [];
 };

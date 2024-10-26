@@ -9,6 +9,7 @@ import QueryBuilder from '../../../builder/QueryBuilder';
 import { Request } from 'express';
 import Notification from '../notifications/notifications.model';
 import { IUser } from '../auth/auth.interface';
+import { makeProductPoints, makeSwapPoints } from '../points/points.services';
 
 const insertIntoDB = async (
   files: any,
@@ -69,6 +70,7 @@ const products = async (query: Record<string, unknown>) => {
     .sort()
     .paginate()
     .fields();
+
   const result = await categoryQuery.modelQuery;
   const meta = await categoryQuery.countTotal();
 
@@ -80,7 +82,9 @@ const products = async (query: Record<string, unknown>) => {
 
 const myProducts = async (user: JwtPayload, query: Record<string, unknown>) => {
   const categoryQuery = new QueryBuilder(
-    Product.find({ user: user.userId }),
+    Product.find({ user: user.userId })
+      .populate('category')
+      .populate('subCategory'),
     query,
   )
     .search([])
@@ -101,33 +105,41 @@ const myProducts = async (user: JwtPayload, query: Record<string, unknown>) => {
 const updateProduct = async (req: Request) => {
   const { files } = req as any;
   const id = req.params.id;
-  const productImage = [];
+  const productImage: string[] = [];
 
-  if (files && 'image' in files && files.image.length) {
-    for (const image of files.image) {
+  console.log("Updated product:", files.product_img);
+
+  if (files && files.product_img && files.product_img.length) {
+    for (const image of files.product_img) {
       productImage.push(`/images/products/${image.filename}`);
     }
   }
 
   const isExist = await Product.findOne({ _id: id });
-
   if (!isExist) {
-    throw new ApiError(404, 'Product not found !');
+    throw new ApiError(404, 'Product not found!');
   }
 
   const updateData = {
     ...req.body,
-    images: productImage,
+    images: productImage.length ? productImage : isExist.images,
   };
 
-  const result = await Product.findOneAndUpdate(
-    { _id: id },
-    { ...updateData },
-    {
-      new: true,
-    },
-  );
-  return result;
+  try {
+    const result = await Product.findOneAndUpdate(
+      { _id: id },
+      { ...updateData },
+      { new: true }
+    );
+    if (!result) {
+      throw new ApiError(500, 'Update failed, no product returned!');
+    }
+
+    return result;
+  } catch (error) {
+    // console.error("Error updating product:", error);
+    throw new ApiError(500, 'Internal server error');
+  }
 };
 
 const deleteProduct = async (id: string) => {
@@ -139,7 +151,10 @@ const deleteProduct = async (id: string) => {
   return await Product.findByIdAndDelete(id);
 };
 
-const singleProduct = async (id: string) => {
+const singleProduct = async (req: Request) => {
+  // const {userId} = req.user as JwtPayload;
+  const { id } = req.params;
+
   const result = await Product.findById(id).populate([
     {
       path: 'category',
@@ -149,12 +164,23 @@ const singleProduct = async (id: string) => {
       path: 'subCategory',
       select: 'name',
     },
+    {
+      path: "user",
+    }
   ]);
+
+  const user = await (User.findById(result?.user._id)) as IUser
+
+  if (!user) {
+    throw new ApiError(404, 'User not found!');
+  }
 
   const similarProduct = await Product.find({
     subCategory: result?.subCategory,
   });
-  return { product: result, similarProduct };
+  const point = await makeProductPoints(result, user.userType)
+
+  return { product: result, similarProduct, point };
 };
 
 const productForSwap = async (req: Request) => {
@@ -195,6 +221,22 @@ const productJustForYou = async (req: Request) => {
   return products;
 };
 
+// const swapPointCount = async (req: Request) => {
+//   const { userId } = req.user as JwtPayload;
+//   const {fromProduct, toProduct}= req.query;
+
+//   if(!fromProduct || !toProduct){
+//     throw new ApiError(400, 'Missing product id');   
+//   } 
+//   const user = (await User.findById(userId)) as IUser;
+
+
+//   const points = await makeSwapPoints({fromProduct, toProduct}, user.userType); 
+
+//   return points;  
+
+// }
+
 export const ProductService = {
   insertIntoDB,
   products,
@@ -205,4 +247,5 @@ export const ProductService = {
   productForSwap,
   topProducts,
   productJustForYou,
+  // swapPointCount
 };

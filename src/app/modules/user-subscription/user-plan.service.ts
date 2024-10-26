@@ -9,9 +9,34 @@ import QueryBuilder from '../../../builder/QueryBuilder';
 import { IReqUser } from '../auth/auth.interface';
 import Notification from '../notifications/notifications.model';
 import { IUpgradePlan } from './user-plan.interface';
+import cron from 'node-cron';
+import { logger } from '../../../shared/logger';
+
+cron.schedule('* * * * *', async () => {
+  try {
+    const now = new Date();
+    const result = await Plan.updateMany(
+      { 
+        planEndDate: { $lte: now },
+      },
+      {
+        $unset: { payment_status: 'unpaid', active: false },
+      },
+    ); 
+
+    if (result.modifiedCount > 0) {
+      logger.info(
+        `Removed activation codes from ${result.modifiedCount} expired inactive users`,
+      );
+    }
+  } catch (error) {
+    logger.error('Error removing activation codes from expired users:', error);
+  }
+});
 
 const createSubscription = async (req: Request) => {
   let data = req.body;
+  const {userId}=  req.user as IReqUser;
 
   const checkUser = await User.findById(req?.user?.userId);
 
@@ -24,9 +49,9 @@ const createSubscription = async (req: Request) => {
   if (!subscriptionPlan) {
     throw new ApiError(404, 'Plan not found');
   }
-  
 
   const startDate = new Date();
+
   const endDate = new Date(
     startDate.getTime() + subscriptionPlan.duration * 24 * 60 * 60 * 1000,
   );
@@ -34,8 +59,29 @@ const createSubscription = async (req: Request) => {
   data.planEndDate = endDate;
   data.user_id = req?.user?.userId;
 
+  // console.log("UPDATE ++++++",data)
+  // console.log("====checkUser=======",data)
+
+  const existingPlan = await Plan.findOne({
+    user_id: userId,
+    payment_status: { $in: ["unpaid", "trial"] }
+  });
+
+  if(existingPlan) {
+   await Plan.deleteOne({ user_id: userId,   payment_status: { $in: ["unpaid", "trial"] } });
+  }
+
   const subscription = await Plan.create(data);
 
+
+  // let payment_status = data.plan_type
+
+  // if(data.plan_type === 'trial'){
+  //   payment_status = 'Trial'
+  // }
+
+  checkUser.userType = data.plan_type
+  checkUser.planExpatDate =endDate
   await checkUser.save();
 
   const notification = await Notification.create({
@@ -71,7 +117,7 @@ const updateSubscription = async (req: Request) => {
   });
 
   if (!updatedSubscription) {
-    throw new ApiError(404, 'Subscription not found');
+    throw new ApiError(404, 'Subscription not found!');
   }
 
   return updatedSubscription;
@@ -155,7 +201,7 @@ const statusUpdateRequest = async (req: Request) => {
 
   const updatedPlan = await Plan.findByIdAndUpdate(
     id,
-    { status, declineReason: reason },
+    { status, declineReason: reason, active: true },
     { new: true, runValidators: true },
   );
 
@@ -174,7 +220,7 @@ const mySubscription = async (req: Request) => {
   if (!isExistUser) {
     throw new ApiError(404, 'User not found');
   }
-  const subscription = await Plan.findOne({ user_id: userId });
+  const subscription = await Plan.findOne({ user_id: userId }).populate("plan_id");
 
   if (!subscription) {
     return null;

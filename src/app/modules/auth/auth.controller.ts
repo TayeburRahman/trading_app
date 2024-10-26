@@ -167,6 +167,18 @@ const block_unblockUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const resendVerificationCode = catchAsync(async (req: Request, res: Response) => {
+  // const token = req.headers.authorization || '';
+  await AuthService.resendVerificationCode(req.body);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Account recovered!',
+  });
+});
+
+ 
+
 export const AuthController = {
   getAllUsers,
   deleteUser,
@@ -181,4 +193,5 @@ export const AuthController = {
   checkIsValidForgetActivationCode,
   resendActivationCode,
   block_unblockUser,
+  resendVerificationCode
 };

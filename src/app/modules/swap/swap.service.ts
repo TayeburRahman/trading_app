@@ -13,7 +13,7 @@ import { makeSwapPoints } from '../points/points.services';
 import Notification from '../notifications/notifications.model';
 
 const makeSwap = async (req: Request) => {
-  const user = req.user as IReqUser;
+  const user: any= req.user as IReqUser;
   const payload = req.body as ISwap;
  
   const isExistUSer = await User.findById(user.userId);
@@ -24,6 +24,15 @@ const makeSwap = async (req: Request) => {
   if (!payload.productFrom || !payload.productTo || !payload.userTo) {
     throw new ApiError(400, 'Product or User is missing');
   }
+
+ // Check swap conditions
+ if (payload.productFrom === payload.productTo) {
+  throw new ApiError(400, 'You cannot swap the same product.');
+}
+
+if (payload.userTo === user.userId) {
+  throw new ApiError(400, 'You cannot swap a product with yourself.');
+}
 
   const result = await Swap.create({
     userFrom: user.userId,
@@ -93,11 +102,17 @@ const approveSwap = async (req: Request): Promise<any> => {
 
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-  }
- 
- 
-  const points = await makeSwapPoints({fromProduct, toProduct}, user.userType);
+  } 
+  const toUser = await (User.findOne({_id: toProduct.user})) as IUser;
 
+  if (!toUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'To user not found');
+  } 
+
+  console.log("======user=====",user)
+  console.log("======toUser=====",toUser)
+
+  const points = await makeSwapPoints({fromProduct, toProduct}, {user, toUser}); 
   // Update swap and user points in parallel
   const [updatedSwap, fromPoint, toPoint] = await Promise.all([
     Swap.findByIdAndUpdate(

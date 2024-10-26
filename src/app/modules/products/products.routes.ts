@@ -60,4 +60,13 @@ router.delete(
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.USER),
   ProductController.deleteProduct,
 );
+
+// router.get(
+//   '/product_point',
+//   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.USER),
+//   ProductController.swapPointCount,
+// );
+
+
+ 
 export const ProductRoutes = router;
