@@ -11,11 +11,13 @@ import { Subscription } from '../subscriptions/subscriptions.model';
 import httpStatus from 'http-status';
 import { makeSwapPoints } from '../points/points.services';
 import Notification from '../notifications/notifications.model';
+import { Ratting } from '../rattings/rattings.model';
+import { Types } from 'mongoose';
 
 const makeSwap = async (req: Request) => {
-  const user: any= req.user as IReqUser;
+  const user: any = req.user as IReqUser;
   const payload = req.body as ISwap;
- 
+
   const isExistUSer = await User.findById(user.userId);
   if (!isExistUSer) {
     throw new ApiError(404, 'Requested User not found');
@@ -25,14 +27,14 @@ const makeSwap = async (req: Request) => {
     throw new ApiError(400, 'Product or User is missing');
   }
 
- // Check swap conditions
- if (payload.productFrom === payload.productTo) {
-  throw new ApiError(400, 'You cannot swap the same product.');
-}
+  // Check swap conditions
+  if (payload.productFrom === payload.productTo) {
+    throw new ApiError(400, 'You cannot swap the same product.');
+  }
 
-if (payload.userTo === user.userId) {
-  throw new ApiError(400, 'You cannot swap a product with yourself.');
-}
+  if (payload.userTo === user.userId) {
+    throw new ApiError(400, 'You cannot swap a product with yourself.');
+  }
 
   const result = await Swap.create({
     userFrom: user.userId,
@@ -41,9 +43,10 @@ if (payload.userTo === user.userId) {
     productTo: payload.productTo,
   });
 
+
   const notificationMessage = 'You have a swap request!.';
   const notification = await Notification.create({
-    title:  `${isExistUSer.name} request you to swap!`, 
+    title: `${isExistUSer.name} request you to swap!`,
     user: payload.userTo,
     message: notificationMessage,
   });
@@ -51,21 +54,52 @@ if (payload.userTo === user.userId) {
   //@ts-ignore
   const socketIo = global.io;
   if (socketIo) {
-    socketIo.emit(`notification::${notification?._id.toString()}`, notification); 
-  }  
+    socketIo.emit(`notification::${notification?._id.toString()}`, notification);
+  }
 
   return result
 };
 
 const pendingSwap = async (req: Request) => {
   const { userId } = req.user as IReqUser;
-  const swaps = await Swap.find({ userFrom: userId });
+  const status = req.query.status;
 
+  if (!status) {
+    throw new ApiError(400, 'Status is required');
+  }
+
+  let swaps: any[] = [];
+
+  if (status === 'my_request') {
+    swaps = await Swap.find({ userFrom: userId, isApproved: "pending" })
+      .populate('productFrom')
+      .populate('productTo')
+      .populate('userFrom')
+      .populate('userTo')
+  }
+
+  if (status === 'receive_request') {
+    swaps = await Swap.find({ userTo: userId, isApproved: "pending" })
+      .populate('productFrom')
+      .populate('productTo')
+      .populate('userFrom')
+      .populate('userTo')
+  }
   return swaps;
 };
 
+const cancelSwapRequest = async (req: Request) => {
+  const id = req.params.id;
+  const deleteSwap = await Swap.findByIdAndDelete(id)
+  return deleteSwap;
+};
+
 const swapDetails = async (id: string) => {
-  return await Swap.findById(id).populate('productFrom').populate('productTo');
+  return await Swap.findById(id)
+    .populate('productFrom')
+    .populate('productTo')
+    .populate('userFrom')
+    .populate('userTo')
 };
 
 const approveSwap = async (req: Request): Promise<any> => {
@@ -75,10 +109,10 @@ const approveSwap = async (req: Request): Promise<any> => {
   // Fetch swap, products, and user in parallel
   const [swap, fromProduct, toProduct, user] = await Promise.all([
     Swap.findById(id).lean(),
-    Swap.findById(id).select('productFrom').then(swap => 
+    Swap.findById(id).select('productFrom').then(swap =>
       swap ? Product.findById(swap.productFrom).lean() : null
     ),
-    Swap.findById(id).select('productTo').then(swap => 
+    Swap.findById(id).select('productTo').then(swap =>
       swap ? Product.findById(swap.productTo).lean() : null
     ),
     User.findById(userId).lean(),
@@ -87,32 +121,26 @@ const approveSwap = async (req: Request): Promise<any> => {
   if (!swap) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Swap not found');
   }
-
   if (!fromProduct) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Product from not found');
   }
-
   if (!toProduct) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Product to not found');
   }
-
   if (swap.isApproved === 'approved') {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Swap already approved');
   }
-
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-  } 
-  const toUser = await (User.findOne({_id: toProduct.user})) as IUser;
-
+  }
+  const toUser = await (User.findOne({ _id: toProduct.user })) as IUser;
   if (!toUser) {
     throw new ApiError(httpStatus.NOT_FOUND, 'To user not found');
-  } 
+  }
 
-  console.log("======user=====",user)
-  console.log("======toUser=====",toUser)
 
-  const points = await makeSwapPoints({fromProduct, toProduct}, {user, toUser}); 
+
+  const points = await makeSwapPoints({ fromProduct, toProduct }, { user, toUser });
   // Update swap and user points in parallel
   const [updatedSwap, fromPoint, toPoint] = await Promise.all([
     Swap.findByIdAndUpdate(
@@ -126,35 +154,50 @@ const approveSwap = async (req: Request): Promise<any> => {
     ),
     Point.findOneAndUpdate(
       { user: swap.userFrom },
-      { $inc: { points: points.earnPointFromUser },
-      $addToSet: {
-        details: {
-          title: 'By swapping product!',
-          point: points.earnPointFromUser ,
-          date: new Date(),
+      {
+        $inc: { points: points.earnPointFromUser },
+        $addToSet: {
+          details: {
+            title: 'By swapping product!',
+            point: points.earnPointFromUser,
+            date: new Date(),
+          },
         },
       },
-    },
       { new: true, upsert: true }
     ),
     Point.findOneAndUpdate(
       { user: swap.userTo },
-      { $inc: { points: points.earnPointToUser },
-      $addToSet: {
-        details: {
-          title: 'By swapping product!',
-          point: points.earnPointToUser ,
-          date: new Date(),
+      {
+        $inc: { points: points.earnPointToUser },
+        $addToSet: {
+          details: {
+            title: 'By swapping product!',
+            point: points.earnPointToUser,
+            date: new Date(),
+          },
         },
       },
-    },
       { new: true, upsert: true }
     ),
   ]); 
 
+  const [to_product, from_product] = await Promise.all([
+    Swap.findByIdAndUpdate(
+      toProduct._id,
+      {
+        status: "completed"
+      }),
+    Swap.findByIdAndUpdate(
+      fromProduct._id,
+      {
+        status: "completed"
+      })
+  ])
+
   const notificationMessage = `Accept your swap request!`;
   const notification = await Notification.create({
-    title:  `Start a chat to swap your product.`, 
+    title: `Start a chat to swap your product.`,
     user: swap.userFrom,
     message: notificationMessage,
   });
@@ -162,12 +205,12 @@ const approveSwap = async (req: Request): Promise<any> => {
   //@ts-ignore
   const socketIo = global.io;
   if (socketIo) {
-    socketIo.emit(`notification::${notification?._id.toString()}`, notification); 
-  }  
+    socketIo.emit(`notification::${notification?._id.toString()}`, notification);
+  }
 
-  return updatedSwap ;
+  return updatedSwap;
 };
- 
+
 const rejectSwap = async (id: string) => {
   const isExist = await Swap.findById(id);
   if (!isExist) {
@@ -182,7 +225,7 @@ const rejectSwap = async (id: string) => {
 
 const getUsersSwapProduct = async (req: Request) => {
   const user = req.user as IReqUser;
-  const title = req.query.productName as string | undefined;  
+  const title = req.query.productName as string | undefined;
 
   try {
     const baseQuery: any = {
@@ -195,15 +238,15 @@ const getUsersSwapProduct = async (req: Request) => {
         },
         { isApproved: 'approved' }
       ]
-    };   
+    };
 
     const populateFields = [
       { path: 'user', select: 'name email phone_number profile_image address' },
       { path: 'category', select: 'name image' },
       { path: 'subCategory', select: 'name' }
     ];
-    
-    const swaps : any[] = await Swap.find(baseQuery)
+
+    const swaps: any[] = await Swap.find(baseQuery)
       .populate({
         path: 'productFrom',
         populate: populateFields
@@ -213,13 +256,13 @@ const getUsersSwapProduct = async (req: Request) => {
         populate: populateFields
       });
 
-      if (title) {
-        const regex = new RegExp(title, 'i');   
-        return swaps.filter(swap  => 
-          (swap.productFrom && regex.test(swap.productFrom.title)) ||
-          (swap.productTo && regex.test(swap.productTo.title))
-        );
-      }
+    if (title) {
+      const regex = new RegExp(title, 'i');
+      return swaps.filter(swap =>
+        (swap.productFrom && regex.test(swap.productFrom.title)) ||
+        (swap.productTo && regex.test(swap.productTo.title))
+      );
+    }
 
     return swaps;
 
@@ -229,11 +272,54 @@ const getUsersSwapProduct = async (req: Request) => {
   }
 };
 
+const partnerProfileDetails = async (req: Request) => {
+  const id = req.params.id;
+  // const user = await User.findById(userId); 
+  const profile = await User.findById(id)
+
+  if (!profile) {
+    throw new ApiError(404, 'User profile not found');
+  }
+  const product = await Product.find({user: id, status: "pending" })
+
+
+  const ratting = await Ratting.find({ swapOwner: id })
+  .populate("swapOwner")
+  .populate("swap")
+  .populate('user')
+
+
+  const result = await Ratting.aggregate([
+    { $match: { swapOwner: new Types.ObjectId(id) } },
+    {
+      $group: {
+        _id: '$swapOwner',
+        averageRating: { $avg: '$ratting' },
+      },
+    },
+  ]);
+
+  let average_rating;
+
+  if (result.length > 0) {
+    average_rating = Number(result[0].averageRating.toFixed(2)); 
+  } else {
+    average_rating = {message: 'No ratings found for this user.'}  
+  }
+
+
+  return {profile, product, ratting, average_rating}
+
+
+}
+
 export const SwapService = {
   makeSwap,
   pendingSwap,
+  cancelSwapRequest,
   swapDetails,
   approveSwap,
   rejectSwap,
-  getUsersSwapProduct
+  getUsersSwapProduct,
+  partnerProfileDetails
 };

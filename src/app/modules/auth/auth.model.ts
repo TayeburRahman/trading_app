@@ -32,6 +32,18 @@ const UserSchema = new Schema<IUser, UserModel>(
     address: {
       type: String,
     },
+    country: {
+      type: String,
+    },
+    zip: {
+      type: String,
+    },
+    city:{
+      type: String,
+    },
+    state: {
+      type: String,
+    },
     points: {
       type: Number,
       default: 0,

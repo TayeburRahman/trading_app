@@ -19,6 +19,7 @@ export type IAdmin = {
   verifyCode: string;
   verifyExpire: Date;
 };
+
 export type AdminModel = {
   isAdminExist(
     email: string,

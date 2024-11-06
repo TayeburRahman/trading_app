@@ -5,25 +5,25 @@ import { Ratting } from './rattings.model';
 import { Types } from 'mongoose';
 import { IReqUser, IUser } from '../auth/auth.interface';
 import User from '../auth/auth.model';
-import { Swap } from '../swap/swap.model'; 
+import { Swap } from '../swap/swap.model';
 import { makePoints } from '../points/points.services';
 import { Point } from '../points/points.model';
 import { Subscription } from '../subscriptions/subscriptions.model';
 
 const insertIntoDB = async (req: Request): Promise<any> => {
   const { userId } = req.user as IReqUser;
-  const { swapId, ratting, comment } = req.body;  
- 
+  const { swapId, ratting, comment } = req.body;
+
   const isExistUser = await User.findById(userId);
   if (!isExistUser) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
- 
+
   const planName = isExistUser.userType === 'Trial' ? 'Gold' : isExistUser.userType;
   const isPackagtes = await Subscription.findOne({ planName });
   if (!isPackagtes) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User subscription plan not found');
-  } 
+  }
 
   const isExistSwap = await Swap.findByIdAndUpdate(
     swapId,
@@ -32,12 +32,12 @@ const insertIntoDB = async (req: Request): Promise<any> => {
   );
   if (!isExistSwap) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Swap not found');
-  } 
+  }
 
   const points = await makePoints(ratting, isPackagtes);
   const pointChange = ratting >= 3 ? points : -points;
 
-  
+
   const updatePoint = await Point.findOneAndUpdate(
     { user: userId },
     {
@@ -55,7 +55,7 @@ const insertIntoDB = async (req: Request): Promise<any> => {
   if (!updatePoint) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
- 
+
   return await Ratting.create({
     user: userId,
     swapOwner: isExistSwap.userTo,
@@ -66,7 +66,7 @@ const insertIntoDB = async (req: Request): Promise<any> => {
 };
 
 const averageRatting = async (req: Request) => {
-  const { userId } = req.user as IReqUser; 
+  const { userId } = req.user as IReqUser;
 
   try {
     const result = await Ratting.aggregate([
@@ -93,8 +93,13 @@ const averageRatting = async (req: Request) => {
 
 const myRattingAndReview = async (req: Request) => {
   const { userId } = req.user as IReqUser;
-  return await Ratting.find({ swapOwner: userId });
+  return await Ratting.find({ swapOwner: userId })
+    .populate("swapOwner")
+    .populate("swap")
+    .populate('user')
 };
+
+
 
 export const RattingService = {
   insertIntoDB,

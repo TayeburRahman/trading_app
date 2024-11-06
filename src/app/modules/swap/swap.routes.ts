@@ -33,5 +33,19 @@ router.get(
   SwapController.getUsersSwapProduct,
 );
 
+router.delete(
+  '/swap-delete/:id',
+  auth(ENUM_USER_ROLE.USER),
+  SwapController.cancelSwapRequest,
+);
+
+router.get(
+  '/partner_profile/:id',
+  auth(ENUM_USER_ROLE.USER),
+  SwapController.partnerProfileDetails,
+);
+
+ 
+
  
 export const SwapRoutes = router;
