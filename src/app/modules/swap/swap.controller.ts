@@ -31,7 +31,6 @@ const cancelSwapRequest: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     console.log("cancelSwapRequest",  req.params.id);
     const result = await SwapService.cancelSwapRequest(req);
-
     sendResponse(res, {
       statusCode: 200,
       success: true,
@@ -41,12 +40,9 @@ const cancelSwapRequest: RequestHandler = catchAsync(
   },
 );
 
- 
-
 const swapDetails: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const result = await SwapService.swapDetails(req.params.id);
-
     sendResponse(res, {
       statusCode: 200,
       success: true,
@@ -59,7 +55,6 @@ const swapDetails: RequestHandler = catchAsync(
 const approveSwap: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const result = await SwapService.approveSwap(req);
-
     sendResponse(res, {
       statusCode: 200,
       success: true,
@@ -85,7 +80,6 @@ const rejectSwap: RequestHandler = catchAsync(
 const getUsersSwapProduct: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const result = await SwapService.getUsersSwapProduct(req);
-
     sendResponse(res, {
       statusCode: 200,
       success: true,
@@ -98,7 +92,6 @@ const getUsersSwapProduct: RequestHandler = catchAsync(
 const partnerProfileDetails: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const result = await SwapService.partnerProfileDetails(req);
-
     sendResponse(res, {
       statusCode: 200,
       success: true,
@@ -107,9 +100,6 @@ const partnerProfileDetails: RequestHandler = catchAsync(
     });
   },
 );
-
-
- 
 
 export const SwapController = {
   makeSwap,
