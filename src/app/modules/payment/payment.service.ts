@@ -24,8 +24,7 @@ const makePaymentIntent = async (payload: { amount: any }) => {
   };
 
   return data;
-};
-
+}; 
 
 const paymentSuccessAndSave = async (payload: {
   amount: number;

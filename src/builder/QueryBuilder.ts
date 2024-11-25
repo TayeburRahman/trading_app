@@ -29,9 +29,14 @@ class QueryBuilder<T> {
     const queryObj = { ...this.query }; // copy
 
     // Filtering
-    const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
+    const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields', 'removeUserId'];
 
     excludeFields.forEach(el => delete queryObj[el]);
+
+    if (this.query.removeUserId) {
+      queryObj.user = { $ne: this.query.removeUserId }; 
+    }
+
 
     this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
 

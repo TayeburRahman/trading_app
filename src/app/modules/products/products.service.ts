@@ -18,8 +18,9 @@ const insertIntoDB = async (
 ) => {
   if (!files?.product_img) {
     throw new ApiError(400, 'File is missing');
-  }
+  } 
   const checkIsExistCategory = await Category.findById(payload.category);
+
   if (!checkIsExistCategory) {
     throw new ApiError(400, 'Category not found');
   }
@@ -64,12 +65,14 @@ const insertIntoDB = async (
 };
 
 const products = async (query: Record<string, unknown>) => {
+  const userId = query.userId;
+
   const categoryQuery = new QueryBuilder(Product.find(), query)
     .search([])
     .filter()
     .sort()
     .paginate()
-    .fields();
+    .fields(); 
 
   const result = await categoryQuery.modelQuery;
   const meta = await categoryQuery.countTotal();
@@ -224,17 +227,12 @@ const productJustForYou = async (req: Request) => {
 // const swapPointCount = async (req: Request) => {
 //   const { userId } = req.user as JwtPayload;
 //   const {fromProduct, toProduct}= req.query;
-
 //   if(!fromProduct || !toProduct){
 //     throw new ApiError(400, 'Missing product id');   
 //   } 
 //   const user = (await User.findById(userId)) as IUser;
-
-
 //   const points = await makeSwapPoints({fromProduct, toProduct}, user.userType); 
-
 //   return points;  
-
 // }
 
 export const ProductService = {

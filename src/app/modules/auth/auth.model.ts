@@ -173,8 +173,7 @@ const UserSchema = new Schema<IUser, UserModel>(
     isApproved: {
       type: Boolean,
       default: false,
-    },
-
+    }, 
     isSubscribed: {
       type: Boolean,
       default: false,

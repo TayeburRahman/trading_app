@@ -113,7 +113,6 @@ const latestPendingUsers = async () => {
   const pendingUsers = await User.find({ isApproved: false }).sort({
     createdAt: -1,
   });
-
   return pendingUsers;
 };
 

@@ -71,17 +71,13 @@ const createSubscription = async (req: Request) => {
    await Plan.deleteOne({ user_id: userId,   payment_status: { $in: ["unpaid", "trial"] } });
   }
 
-  const subscription = await Plan.create(data);
+  const paymentStatus = data.plan_type === "Trial" ? "trial" : "unpaid";
+  data.payment_status = paymentStatus;
 
-
-  // let payment_status = data.plan_type
-
-  // if(data.plan_type === 'trial'){
-  //   payment_status = 'Trial'
-  // }
-
+  const subscription = await Plan.create(data); 
+  
   checkUser.userType = data.plan_type
-  checkUser.planExpatDate =endDate
+  checkUser.planExpatDate = endDate
   await checkUser.save();
 
   const notification = await Notification.create({
