@@ -32,6 +32,8 @@ const registrationUser = async (payload: IRegistration) => {
   const { firstName, lastName, email, password, phone_number, role, confirmPassword } =
     payload as any
 
+    console.log("Auth", role)
+
     if(!firstName){
       throw new ApiError(400, "First Name is required!");
 
@@ -81,7 +83,6 @@ const registrationUser = async (payload: IRegistration) => {
 //!
 const createActivationToken = () => {
   const activationCode = Math.floor(100000 + Math.random() * 900000).toString();
-
   return { activationCode };
 };
 
@@ -141,7 +142,6 @@ cron.schedule('* * * * *', async () => {
     logger.error('Error deleting expired users:', error);
   }
 });
-
 //!
 const getAllUsers = async (
   query: Record<string, unknown>,
@@ -161,7 +161,6 @@ const getAllUsers = async (
     data: result,
   };
 };
-
 //!
 const updateProfile = async (req: Request): Promise<IUser | null> => {
   //@ts-ignore
@@ -285,7 +284,6 @@ const deleteMyAccount = async (payload: {
   }
   return await User.findOneAndDelete({ email });
 };
-
 //!
 const changePassword = async (
   user: JwtPayload | null,
@@ -313,7 +311,6 @@ const changePassword = async (
   isUserExist.password = newPassword;
   await isUserExist.save();
 };
-
 //!
 const forgotPass = async (payload: { email: string }) => {
   const user = (await User.findOne({ email: payload.email })) as IUser;
@@ -340,7 +337,6 @@ const forgotPass = async (payload: { email: string }) => {
   );
 };
 //!
-
 const resendVerificationCode = async (payload: { email: string }) => {
   const email = payload.email;
   const user = await User.findOne({ email });
@@ -380,7 +376,7 @@ const resendVerificationCode = async (payload: { email: string }) => {
   `,
   );
 };
-
+//
 const resendActivationCode = async (payload: { email: string }) => {
   const email = payload.email;
   const user = await User.findOne({ email });
@@ -424,8 +420,6 @@ const resendActivationCode = async (payload: { email: string }) => {
   `,
   );
 };
-//!
-
 // Code verify - done
 cron.schedule('* * * * *', async () => {
   try {

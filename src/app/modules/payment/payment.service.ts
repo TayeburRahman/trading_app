@@ -8,9 +8,8 @@ import { ISubscriptions } from '../subscriptions/subscriptions.interface';
 
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 
-const makePaymentIntent = async (payload: { amount: any }) => {
-
-  const amount = Math.trunc(payload.amount * 100);
+const makePaymentIntent = async (payload: { amount: any }) => { 
+  const amount = Math.trunc(payload.amount * 100); 
 
   const paymentIntent = await stripe.paymentIntents.create({
     amount,
