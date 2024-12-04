@@ -11,6 +11,8 @@ import Notification from '../notifications/notifications.model';
 import { IUpgradePlan } from './user-plan.interface';
 import cron from 'node-cron';
 import { logger } from '../../../shared/logger';
+import { Point } from '../points/points.model';
+import { IPoints } from '../points/points.interface';
 
 cron.schedule('* * * * *', async () => {
   try {
@@ -224,6 +226,29 @@ const mySubscription = async (req: Request) => {
   return subscription;
 };
 
+const myMembership = async (req: Request) => {
+  const { userId } = req.params;
+  const profile = await User.findById(userId);  
+  if (!profile) {
+    throw new ApiError(404, 'User not found');
+  }
+  const plan = await Plan.findOne({ user_id: userId })
+  .populate("plan_id")
+   .select("amount planStartDate planEndDate plan_type status name email" )  
+   const point = await Point.findOne({user: userId}) as IPoints
+
+  return { profile, plan, point : point? point?.points: 0 }
+}
+
+const getPointList = async (req: Request) =>{
+  const {userId} = req.params;
+  if (!userId) {
+    throw new ApiError(401, 'User not authenticated');
+  }
+  const points = await Point.findOne({user: userId});
+ return points
+}
+
 export const UpgradePlanService = {
   updateSubscription,
   AllSubscriber,
@@ -231,4 +256,6 @@ export const UpgradePlanService = {
   createSubscription,
   statusUpdateRequest,
   getSubscribeData,
+  myMembership,
+  getPointList
 };

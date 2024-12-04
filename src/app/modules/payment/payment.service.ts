@@ -20,8 +20,7 @@ const makePaymentIntent = async (payload: { amount: any }) => {
   const data = {
     client_secret: paymentIntent.client_secret,
     transactionId: paymentIntent.id,
-  };
-
+  }; 
   return data;
 }; 
 

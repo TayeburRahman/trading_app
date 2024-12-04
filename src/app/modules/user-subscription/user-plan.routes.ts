@@ -37,6 +37,20 @@ router.patch(
   '/subscribe/:id/request',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   UpgradePlanController.statusUpdateRequest,
-);
+)
+
+router.get(
+  '/profile/:userId',
+  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  UpgradePlanController.myMembership,
+)
+router.get(
+  '/all-points/:userId',
+  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  UpgradePlanController.getPointList)
+
+ 
+
+ 
 
 export const UpgradePlanRoutes = router;

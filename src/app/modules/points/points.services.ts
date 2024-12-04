@@ -2,6 +2,8 @@ import httpStatus from 'http-status';
 import { ISubscriptions } from '../subscriptions/subscriptions.interface';
 import { Subscription } from '../subscriptions/subscriptions.model';
 import ApiError from '../../../errors/ApiError';
+import { Point } from './points.model';
+import { IReqUser } from '../auth/auth.interface';
 
 const makePoints = async (ratting: number, isPackagtes: ISubscriptions) => {
   let point = 0;
@@ -60,16 +62,12 @@ const makeSwapPoints = async (product: any, userBoth: any) => {
     100;
   const earnPointFromUser = Math.floor(fromUserPoints);
   const earnPointToUser = Math.floor(toUserPoints);
-
-  console.log("======toUserPoints====", toUserPoints)
-  console.log("======fromUserPoints====", fromUserPoints)
+ 
 
   return { earnPointFromUser, earnPointToUser };
 };
 
 const makeProductPoints = async (product: any, planName: string) => {
- 
-
   const isUserPackage = await Subscription.findOne({ planName });
   if (!isUserPackage) {
     throw new ApiError(
@@ -87,5 +85,7 @@ const makeProductPoints = async (product: any, planName: string) => {
 
   return earnPointUser ;
 };
+
+ 
 
 export { makePoints, makeSwapPoints, makeProductPoints };

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import catchAsync from '../../../shared/catchasync';
 import sendResponse from '../../../shared/sendResponse';
 import { UpgradePlanService } from './user-plan.service';
+import { IReqUser } from '../auth/auth.interface';
 
 const createSubscription = catchAsync(async (req: Request, res: Response) => {
   const result = await UpgradePlanService.createSubscription(req);
@@ -63,6 +64,30 @@ const mySubscription = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const myMembership = catchAsync(async (req: Request, res: Response) => {
+  const result = await UpgradePlanService.myMembership(req);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'My Plan retrieved successful',
+    data: result,
+  });
+});
+
+const getPointList = catchAsync(async (req: Request, res: Response) => {
+  const result = await UpgradePlanService.getPointList(req);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'My Plan retrieved successful',
+    data: result,
+  });
+});
+
+ 
+
+ 
+
 export const UpgradePlanController = {
   upgradeSubscription,
   AllSubscriber,
@@ -70,4 +95,6 @@ export const UpgradePlanController = {
   createSubscription,
   statusUpdateRequest,
   getSubscribeData,
+  myMembership,
+  getPointList
 };
