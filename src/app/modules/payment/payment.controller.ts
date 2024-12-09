@@ -28,9 +28,40 @@ const paymentSuccessAndSave = catchAsync(async (req: Request, res: Response) => 
 });
 
 
+const getTotalIncomeByPlanType = catchAsync(async (req: Request, res: Response) => {
+  const result = await PaymentService.getAllPlanIncome();
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Successfully',
+    data: result,
+  });
+  
+});
+
+const getTransitionsHistory = catchAsync(async (req: Request, res: Response) => {
+  const result = await PaymentService.getTransitionsHistory();
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Successfully',
+    data: result,
+  });
+  
+});
+
+
+
+ 
+ 
+
  
 
 export const PaymentController = {
   makePaymentIntent,
-  paymentSuccessAndSave
+  paymentSuccessAndSave,
+  getTotalIncomeByPlanType,
+  getTransitionsHistory
 };

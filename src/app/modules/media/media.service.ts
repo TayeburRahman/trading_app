@@ -58,6 +58,7 @@ const allVideoAdds = async (query: Record<string, unknown>) => {
     data: result,
   };
 };
+
 const updateAdds = async (req: Request) => {
   const { files } = req as any;
   const id = req.params.id;
@@ -72,16 +73,15 @@ const updateAdds = async (req: Request) => {
   if (!isExist) {
     throw new ApiError(404, 'Adds not found !');
   }
-
-  const updatedData: Partial<IAdds> = { ...AddsData };
-
+  // console.log("image", AddsData)
   const result = await Adds.findOneAndUpdate(
     { _id: id },
-    { ...updatedData },
+    { ...AddsData },
     {
       new: true,
     },
   );
+  // console.log("result", result)
   return result;
 };
 const updateVideoAdds = async (req: Request) => {

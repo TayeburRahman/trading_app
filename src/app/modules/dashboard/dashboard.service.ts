@@ -275,6 +275,32 @@ const getUserTypePoints = async () => {
   }
 };
 
+const getIncomeDebag = async () => {
+  const totalUser = await User.countDocuments({ role: 'USER' });
+
+  const totalIncome = await Plan.aggregate([
+    {
+      $group: {
+        _id: null,
+        total: { $sum: '$amount' },
+      },
+    },
+  ]);
+
+  const goldUsers = await User.countDocuments({ userType: 'Gold' });
+  const platinumUsers = await User.countDocuments({ userType: 'Platinum' });
+  const diamondUsers = await User.countDocuments({ userType: 'Diamond' });
+
+  return {
+    totalUser,
+    totalIncome: totalIncome.length > 0 ? totalIncome[0].total : 0,
+    goldUsers,
+    platinumUsers,
+    diamondUsers,
+  };
+};
+
+
 export const DashboardService = {
   totalCount,
   getMonthlySubscriptionGrowth,
@@ -283,4 +309,5 @@ export const DashboardService = {
   rejectUser,
   latestPendingUsers,
   getUserTypePoints,
+  getIncomeDebag
 };

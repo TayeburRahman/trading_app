@@ -7,4 +7,5 @@ export type IPayment = {
   amount: number;
   transaction_id: string;
   note: string;
+  package_id: Schema.Types.ObjectId;
 };

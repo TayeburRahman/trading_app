@@ -10,6 +10,10 @@ const paymentSchema = new Schema<IPayment>(
     },
     plan_id: {
       type: Schema.Types.ObjectId,
+      ref: 'Plan',
+    },
+    package_id: {
+      type: Schema.Types.ObjectId,
       ref: 'Subscription',
     },
     amount: Number,

@@ -16,6 +16,22 @@ router.post(
   PaymentController.paymentSuccessAndSave,
 );
 
+router.get(
+  '/incomes-totals',
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  PaymentController.getTotalIncomeByPlanType,
+);
+
+router.get(
+  '/transitions-history',
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  PaymentController.getTransitionsHistory,
+);
+
+ 
+
+ 
+
  
 
 export const PaymentRoutes = router;

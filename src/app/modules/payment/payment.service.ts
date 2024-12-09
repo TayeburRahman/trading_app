@@ -29,10 +29,10 @@ const paymentSuccessAndSave = async (payload: {
   user: string;
   transaction_id: string;
   plan_id: string;
-  subscriptions_id: string;
+  package_id: string;
 }) => {
 
-  const requiredFields = ["amount", "user", "transaction_id", "plan_id", "subscriptions_id"] as const;
+  const requiredFields = ["amount", "user", "transaction_id", "plan_id", "package_id"] as const;
 
   for (const field of requiredFields) {
     if (!payload[field]) {
@@ -42,7 +42,7 @@ const paymentSuccessAndSave = async (payload: {
 
   const result = await Payment.create(payload);
 
-  const subscriptionPlan = await Subscription.findById(payload.subscriptions_id) as ISubscriptions;
+  const subscriptionPlan = await Subscription.findById(payload.package_id) as ISubscriptions;
 
   if (!subscriptionPlan) {
     throw new ApiError(404, "Subscription plan not found.");
@@ -67,4 +67,133 @@ const paymentSuccessAndSave = async (payload: {
 
   return { payment: result, plan: update };
 };
-export const PaymentService = { makePaymentIntent, paymentSuccessAndSave };
+  
+const getGoldIncome = async () => {
+  try {
+    const goldPlan = await Subscription.findOne({ planName: 'Gold' });
+    const goldPlanId = goldPlan ? goldPlan._id.toString() : null; 
+
+    if (!goldPlanId) {
+      return { message: 'Gold plan not found.' };
+    }
+
+    const totalIncomeForGold = await Payment.aggregate([
+      {
+        $match: {
+          package_id: goldPlanId,  
+        },
+      },
+      {
+        $group: {
+          _id: null,  
+          totalIncome: { $sum: '$amount' },
+        },
+      },
+    ]);
+
+    // console.log("totalIncomeForGold", totalIncomeForGold)
+
+    return { planType: 'Gold', totalIncome: totalIncomeForGold[0]?.totalIncome || 0 };
+  } catch (error) {
+    console.error('Error fetching Gold income:', error);
+    return { message: 'Error fetching data.' };
+  }
+};
+
+
+const getPlatinumIncome = async () => {
+  try {
+    const platinumPlan = await Subscription.findOne({ planName: 'Platinum' });
+    const platinumPlanId = platinumPlan ? platinumPlan._id : null;
+
+    if (!platinumPlanId) {
+      return { message: 'Platinum plan not found.' };
+    }
+
+    const totalIncomeForPlatinum = await Payment.aggregate([
+      {
+        $match: {
+          package_id: platinumPlanId, 
+        },
+      },
+      {
+        $group: {
+          _id: null,  
+          totalIncome: { $sum: '$amount' },
+        },
+      },
+    ]);
+
+    return { planType: 'Platinum', totalIncome: totalIncomeForPlatinum[0]?.totalIncome || 0 };
+  } catch (error) {
+    console.error('Error fetching Platinum income:', error);
+    return { message: 'Error fetching data.' };
+  }
+};
+
+
+const getDiamondIncome = async () => {
+  try {
+    const diamondPlan = await Subscription.findOne({ planName: 'Diamond' });
+    const diamondPlanId = diamondPlan ? diamondPlan._id : null;
+
+    if (!diamondPlanId) {
+      return { message: 'Diamond plan not found.' };
+    }
+
+    const totalIncomeForDiamond = await Payment.aggregate([
+      {
+        $match: {
+          package_id: diamondPlanId,  
+        },
+      },
+      {
+        $group: {
+          _id: null,  
+          totalIncome: { $sum: '$amount' },
+        },
+      },
+    ]);
+
+    return { planType: 'Diamond', totalIncome: totalIncomeForDiamond[0]?.totalIncome || 0 };
+  } catch (error) {
+    console.error('Error fetching Diamond income:', error);
+    return { message: 'Error fetching data.' };
+  }
+};
+
+
+const getAllPlanIncome = async () => {
+  const goldIncome = await getGoldIncome();
+  const platinumIncome = await getPlatinumIncome();
+  const diamondIncome = await getDiamondIncome();
+
+  return {
+    totalIncome: goldIncome.totalIncome + platinumIncome.totalIncome + diamondIncome.totalIncome,
+    planIncome: [
+      goldIncome,
+      platinumIncome,
+      diamondIncome,
+    ],
+  };
+};
+
+const getTransitionsHistory = async () => {
+  const payments = await Payment.find({})
+   .populate('user', 'name email address')
+   .populate('package_id') 
+   .sort({ createdAt: -1 });
+
+   return payments;
+}
+
+// getAllIncome().then((result) => {
+//   console.log(result);
+// });
+
+
+
+
+
+
+export const PaymentService = { makePaymentIntent, paymentSuccessAndSave, getAllPlanIncome, getTransitionsHistory};
