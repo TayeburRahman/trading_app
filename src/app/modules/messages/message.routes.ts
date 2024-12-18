@@ -17,8 +17,7 @@ router.post(
   messageController.sendMessage,
 );
 router.get(
-  '/get-conversation',
-  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.USER),
+  '/get-conversation/:userId', 
   messageController.conversationUser,
 );
 router.get(

@@ -4,6 +4,7 @@ import QueryBuilder from '../../../builder/QueryBuilder';
 import ApiError from '../../../errors/ApiError';
 import { IAdds, IAddsVideo } from './media.interface';
 import { Adds, VideoAdds } from './media.model';
+import mongoose from 'mongoose';
 
 const insertIntoDB = async (files: any, payload: IAdds) => {
   if (!files?.image) {
@@ -85,30 +86,47 @@ const updateAdds = async (req: Request) => {
   return result;
 };
 const updateVideoAdds = async (req: Request) => {
-  const { files } = req as any;
+  const { files } = req as any;  
   const id = req.params.id;
   const { ...AddsData } = req.body;
 
-  if (files && files.video) {
-    AddsData.video = `/video/${files.video[0].filename}`;
+  // Validate the ID
+  if (!id) {
+    throw new ApiError(400, 'Missing VideoAdds ID.');
+  }
+  
+  if (!AddsData || Object.keys(AddsData).length === 0) {
+    throw new ApiError(400, 'Missing or invalid VideoAdds data.');
   }
 
-  const isExist = await VideoAdds.findOne({ _id: id });
+  try {
+    console.log("Update VideoAdds Request:", AddsData);
+ 
+    if (files && files.video && files.video[0]) {
+      AddsData.video = `/video/${files.video[0].filename}`;
+    }
+ 
+    const isExist = await VideoAdds.findById(id);
+    if (!isExist) {
+      throw new ApiError(404, 'VideoAdds not found.');
+    }
+ 
+    const updatedData: Partial<IAddsVideo> = { ...AddsData };
+    const result = await VideoAdds.findOneAndUpdate(
+      { _id: id },
+      { ...updatedData },
+      { new: true, runValidators: true }
+    );
 
-  if (!isExist) {
-    throw new ApiError(404, 'VideoAdds not found !');
+    if (!result) {
+      throw new ApiError(500, 'Failed to update VideoAdds.');
+    }
+
+    return result;
+  } catch (error: any) {
+    console.error('Error updating VideoAdds:', error);
+    throw new ApiError(500, `An error occurred while updating VideoAdds: ${error.message}`);
   }
-
-  const updatedData: Partial<IAddsVideo> = { ...AddsData };
-
-  const result = await VideoAdds.findOneAndUpdate(
-    { _id: id },
-    { ...updatedData },
-    {
-      new: true,
-    },
-  );
-  return result;
 };
 const deleteAdds = async (id: string) => {
   const isExist = await Adds.findOne({ _id: id });

@@ -12,8 +12,7 @@ router.post(
   SubCategoryController.insertIntoDB,
 );
 router.get(
-  '/get-all',
-  // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.USER),
+  '/get-all', 
   SubCategoryController.categories,
 );
 router.patch(

@@ -98,8 +98,7 @@ const getGoldIncome = async () => {
     console.error('Error fetching Gold income:', error);
     return { message: 'Error fetching data.' };
   }
-};
-
+}; 
 
 const getPlatinumIncome = async () => {
   try {
@@ -129,8 +128,7 @@ const getPlatinumIncome = async () => {
     console.error('Error fetching Platinum income:', error);
     return { message: 'Error fetching data.' };
   }
-};
-
+}; 
 
 const getDiamondIncome = async () => {
   try {
@@ -160,8 +158,7 @@ const getDiamondIncome = async () => {
     console.error('Error fetching Diamond income:', error);
     return { message: 'Error fetching data.' };
   }
-};
-
+}; 
 
 const getAllPlanIncome = async () => {
   const goldIncome = await getGoldIncome();
@@ -181,19 +178,12 @@ const getAllPlanIncome = async () => {
 const getTransitionsHistory = async () => {
   const payments = await Payment.find({})
    .populate('user', 'name email address')
+   .populate('plan_id', 'plan_type') 
    .populate('package_id') 
    .sort({ createdAt: -1 });
 
    return payments;
 }
-
-// getAllIncome().then((result) => {
-//   console.log(result);
-// });
-
-
-
-
 
 
 export const PaymentService = { makePaymentIntent, paymentSuccessAndSave, getAllPlanIncome, getTransitionsHistory};

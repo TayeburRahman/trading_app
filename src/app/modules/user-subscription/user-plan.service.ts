@@ -13,6 +13,7 @@ import cron from 'node-cron';
 import { logger } from '../../../shared/logger';
 import { Point } from '../points/points.model';
 import { IPoints } from '../points/points.interface';
+import { ISubscriptions } from '../subscriptions/subscriptions.interface';
 
 cron.schedule('* * * * *', async () => {
   try {
@@ -40,13 +41,13 @@ const createSubscription = async (req: Request) => {
   let data = req.body;
   const {userId}=  req.user as IReqUser;
 
-  const checkUser = await User.findById(req?.user?.userId);
+  const checkUser = await User.findById(userId);
 
   if (!checkUser) {
     throw new ApiError(404, 'User not found');
   }
 
-  const subscriptionPlan = await Subscription.findById(data.plan_id);
+  const subscriptionPlan = await Subscription.findById(data.plan_id) as ISubscriptions;
 
   if (!subscriptionPlan) {
     throw new ApiError(404, 'Plan not found');

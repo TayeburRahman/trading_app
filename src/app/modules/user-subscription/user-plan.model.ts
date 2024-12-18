@@ -1,8 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { IUpgradePlan } from './user-plan.interface';
 
-const subscriptionSchema = new Schema<IUpgradePlan>(
-  {
+const subscriptionSchema = new Schema<IUpgradePlan>({
     user_id: {
       type: Schema.Types.ObjectId,
       ref: 'User',
@@ -27,7 +26,7 @@ const subscriptionSchema = new Schema<IUpgradePlan>(
     },
     plan_type: {
       type: String,
-      enum: ['Trial', 'Gold', 'Premium', 'Platinum'],
+      enum: ['Trial', 'Gold', 'Platinum', 'Platinum'],
       required: true,
     },
     status: {

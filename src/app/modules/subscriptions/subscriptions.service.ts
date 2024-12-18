@@ -2,13 +2,38 @@ import { Request } from 'express';
 import ApiError from '../../../errors/ApiError';
 import { ISubscriptions } from './subscriptions.interface';
 import { Subscription } from './subscriptions.model';
+import { Plan } from '../user-subscription/user-plan.model';
+import User from '../auth/auth.model';
 
 const insertIntoDB = async (payload: ISubscriptions) => {
   return await Subscription.create(payload);
 };
 
-const subscriptions = async () => {
-  return await Subscription.find().sort({ pointRangeStart: 1 });
+const subscriptions = async (req: any) => {
+  const query = req.query;
+  let userPlan = null;
+
+  if (query?.userId) {
+    const user = await User.findById(query?.userId);
+    if (!user) {
+      throw new ApiError(404, 'User not found!');
+    }
+ 
+    const subscriptions = await Plan.find({ user_id: query?.userId, active: true }) as any;
+    userPlan = subscriptions.map((sub: any) => sub.plan_id);  
+  }
+ 
+  const result = await Subscription.find().sort({ pointRangeStart: 1 });
+ 
+  const subscriptionsWithPlanStatus = result.map((subscription: any) => {
+    const hasUserPlan = userPlan && userPlan.some((planId: any) => planId.toString() === subscription.plan_id.toString());
+    return {
+      ...subscription.toObject(),
+      hasUserPlan, 
+    };
+  });
+
+  return { subscriptions: subscriptionsWithPlanStatus };
 };
 
 const updateSubscription = async (req: Request) => {
@@ -32,6 +57,7 @@ const updateSubscription = async (req: Request) => {
   );
   return result;
 };
+
 const deleteSubscription = async (id: string) => {
   const isExist = await Subscription.findOne({ _id: id });
 

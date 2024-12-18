@@ -3,7 +3,10 @@ import { IPayment } from './payment.interface';
 
 const paymentSchema = new Schema<IPayment>(
   {
-    payment_method: String,
+    payment_method: {
+      type: String,
+      default: 'Card',
+    },
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
