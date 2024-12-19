@@ -13,7 +13,6 @@ import { makeSwapPoints } from '../points/points.services';
 import Notification from '../notifications/notifications.model';
 import { Ratting } from '../rattings/rattings.model';
 import { Types } from 'mongoose';
-import { ISubscriptions } from '../subscriptions/subscriptions.interface';
 
 const makeSwap = async (req: Request) => {
   const user: any = req.user as IReqUser;
@@ -224,9 +223,57 @@ const rejectSwap = async (id: string) => {
     { new: true },
   );
 };
- 
 
 const getUsersSwapProduct = async (req: Request) => {
+  const user = req.user as IReqUser; 
+  const title = req.query.productName as string | undefined;
+
+  try {
+    const baseQuery: any = {
+      $and: [
+        {
+          $or: [
+            { userFrom: user.userId },
+            { userTo: user.userId }
+          ]
+        },
+        { isApproved: 'approved' }, 
+      ]
+    };
+
+    const populateFields = [
+      { path: 'user', select: 'name email phone_number profile_image address' },
+      { path: 'category', select: 'name image' },
+      { path: 'subCategory', select: 'name' }
+    ];
+
+    const swaps: any[] = await Swap.find(baseQuery)
+      .populate({
+        path: 'productFrom',
+        populate: populateFields
+      })
+      .populate({
+        path: 'productTo',
+        populate: populateFields
+      });
+
+    if (title) {
+      const regex = new RegExp(title, 'i');
+      return swaps.filter(swap =>
+        (swap.productFrom && regex.test(swap.productFrom.title)) ||
+        (swap.productTo && regex.test(swap.productTo.title))
+      );
+    }
+
+    return swaps;
+
+  } catch (error) {
+    console.error("Error fetching swaps:", error);
+    throw new Error("Failed to fetch swaps");
+  }
+};
+
+const getSwapProductPlanType = async (req: Request) => {
   const user = req.user as { userId: string };
   const planType = req.query.planType as string | undefined;
   const title = req.query.productName as string | undefined; 
@@ -245,8 +292,7 @@ const getUsersSwapProduct = async (req: Request) => {
     };
 
     console.log("Generated Query:", JSON.stringify(baseQuery, null, 2));
-
-    // Fetch all swaps without plan_type filtering in the query
+ 
     const swaps: any[] = await Swap.find(baseQuery)
       .populate({
         path: 'productFrom',
@@ -305,9 +351,6 @@ const getUsersSwapProduct = async (req: Request) => {
   }
 };
 
-
-
-
 const partnerProfileDetails = async (req: Request) => {
   const id = req.params.id;
   // const user = await User.findById(userId); 
@@ -357,5 +400,6 @@ export const SwapService = {
   approveSwap,
   rejectSwap,
   getUsersSwapProduct,
-  partnerProfileDetails
+  partnerProfileDetails,
+  getSwapProductPlanType
 };

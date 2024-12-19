@@ -45,6 +45,14 @@ router.get(
   SwapController.partnerProfileDetails,
 );
 
+router.get(
+  '/swap-histoy-plan',
+  auth(ENUM_USER_ROLE.USER),
+  SwapController.getSwapProductPlanType,
+);
+
+ 
+
  
 
  

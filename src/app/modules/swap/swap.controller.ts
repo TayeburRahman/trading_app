@@ -101,6 +101,19 @@ const partnerProfileDetails: RequestHandler = catchAsync(
   },
 );
 
+const getSwapProductPlanType: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await SwapService.getSwapProductPlanType(req);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Partner profile history successfully get!',
+      data: result,
+    });
+  },
+);
+ 
+
 export const SwapController = {
   makeSwap,
   pendingSwap,
@@ -109,5 +122,6 @@ export const SwapController = {
   rejectSwap,
   getUsersSwapProduct,
   cancelSwapRequest,
-  partnerProfileDetails
+  partnerProfileDetails,
+  getSwapProductPlanType
 };
