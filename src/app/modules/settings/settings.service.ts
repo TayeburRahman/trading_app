@@ -1,4 +1,4 @@
-import { AboutUs, Facts, TermsConditions } from './settings.model';
+import { AboutUs, Facts, Faq, TermsConditions } from './settings.model';
 
 //! Facts
 const addFacts = async (payload: any) => {
@@ -50,6 +50,36 @@ const getTermsConditions = async () => {
   return await TermsConditions.findOne();
 };
 
+// ====
+//! Faqs
+const addFaq = async (payload: any) => {
+ 
+  if (!payload?.questions || !payload?.answer){
+    throw new Error("Question and answer are required");
+  }
+ 
+   return await Faq.create(payload); 
+};
+const updateFaq = async (req: any) => {
+  const id =  req.params.id
+ 
+  const payload =  req.body
+  if (!payload?.questions || !payload?.answer){
+    throw new Error("Question and answer are required");
+  }
+
+  const result = await Faq.findByIdAndUpdate(id, payload, { new: true });
+
+   return result
+};
+const deleteFaq = async (req: any) => {
+  const id = req.params.id
+   return await Faq.findByIdAndDelete(id);
+};
+const getFaq = async () => {
+  return await Faq.find();
+};
+
 export const ManageService = {
   addFacts,
   addAboutUs,
@@ -57,4 +87,8 @@ export const ManageService = {
   getFacts,
   getAboutUs,
   getTermsConditions,
+  addFaq,
+  updateFaq,
+  deleteFaq,
+  getFaq,
 };

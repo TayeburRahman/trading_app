@@ -58,6 +58,44 @@ const getTermsConditions = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// --------------------
+const addFaq = catchAsync(async (req: Request, res: Response) => {
+  const result = await ManageService.addFaq(req.body);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Successfully create!',
+    data: result,
+  });
+});
+const updateFaq = catchAsync(async (req: Request, res: Response) => {
+  const result = await ManageService.updateFaq(req); 
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Successfully Update!',
+    data: result,
+  });
+});
+const deleteFaq = catchAsync(async (req: Request, res: Response) => {
+  const result = await ManageService.deleteFaq(req);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Successfully Delete!',
+    data: result,
+  });
+});
+const getFaq = catchAsync(async (req: Request, res: Response) => {
+  const result = await ManageService.getFaq();
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Successfully get!',
+    data: result,
+  });
+});
+
 export const ManageController = {
   addFacts,
   addAboutUs,
@@ -65,4 +103,8 @@ export const ManageController = {
   getFacts,
   getAboutUs,
   getTermsConditions,
+  addFaq,
+  getFaq,
+  deleteFaq,
+  updateFaq
 };

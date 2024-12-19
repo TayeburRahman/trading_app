@@ -20,7 +20,6 @@ router.post(
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   ManageController.addFacts,
 );
-
 router.get(
   '/get-about-us',
   ManageController.getAboutUs,
@@ -30,9 +29,24 @@ router.get(
   ManageController.getTermsConditions,
 );
 router.get(
-  '/get-facts',
-
+  '/get-facts', 
   ManageController.getFacts,
 );
+router.post(
+  '/add-faqs',
+  ManageController.addFaq,
+); 
+router.patch(
+  '/update-faqs/:id',
+  ManageController.updateFaq,
+);
+router.delete(
+  '/delete-faqs/:id',
+  ManageController.deleteFaq,
+);
+router.get(
+  '/get-faqs',
+  ManageController.getFaq,
+);  
 
 export const ManageRoutes = router;
