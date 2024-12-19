@@ -13,6 +13,7 @@ import { makeSwapPoints } from '../points/points.services';
 import Notification from '../notifications/notifications.model';
 import { Ratting } from '../rattings/rattings.model';
 import { Types } from 'mongoose';
+import { ISubscriptions } from '../subscriptions/subscriptions.interface';
 
 const makeSwap = async (req: Request) => {
   const user: any = req.user as IReqUser;
@@ -41,6 +42,7 @@ const makeSwap = async (req: Request) => {
     userTo: payload.userTo,
     productFrom: payload.productFrom,
     productTo: payload.productTo,
+    plan_type:isExistUSer.userType
   });
 
 
@@ -222,10 +224,12 @@ const rejectSwap = async (id: string) => {
     { new: true },
   );
 };
+ 
 
 const getUsersSwapProduct = async (req: Request) => {
-  const user = req.user as IReqUser;
-  const title = req.query.productName as string | undefined;
+  const user = req.user as { userId: string };
+  const planType = req.query.planType as string | undefined;
+  const title = req.query.productName as string | undefined; 
 
   try {
     const baseQuery: any = {
@@ -236,41 +240,73 @@ const getUsersSwapProduct = async (req: Request) => {
             { userTo: user.userId }
           ]
         },
-        { isApproved: 'approved' }
+        { isApproved: 'approved' },
       ]
     };
 
-    const populateFields = [
-      { path: 'user', select: 'name email phone_number profile_image address' },
-      { path: 'category', select: 'name image' },
-      { path: 'subCategory', select: 'name' }
-    ];
+    console.log("Generated Query:", JSON.stringify(baseQuery, null, 2));
 
+    // Fetch all swaps without plan_type filtering in the query
     const swaps: any[] = await Swap.find(baseQuery)
       .populate({
         path: 'productFrom',
-        populate: populateFields
+        populate: [
+          { path: 'user', select: 'name email phone_number profile_image address' },
+          { path: 'category', select: 'name image' },
+          { path: 'subCategory', select: 'name' }
+        ]
       })
       .populate({
         path: 'productTo',
-        populate: populateFields
+        populate: [
+          { path: 'user', select: 'name email phone_number profile_image address' },
+          { path: 'category', select: 'name image' },
+          { path: 'subCategory', select: 'name' }
+        ]
       });
+ 
+    const filteredSwaps = swaps.filter(swap => { 
+      const matchesPlanType = planType ? swap.plan_type.toLowerCase() === planType.toLowerCase() : true; 
+      const matchesTitle = title
+        ? (swap.productFrom && new RegExp(title, 'i').test(swap.productFrom.title)) ||
+          (swap.productTo && new RegExp(title, 'i').test(swap.productTo.title))
+        : true;
 
-    if (title) {
-      const regex = new RegExp(title, 'i');
-      return swaps.filter(swap =>
-        (swap.productFrom && regex.test(swap.productFrom.title)) ||
-        (swap.productTo && regex.test(swap.productTo.title))
-      );
-    }
+      return matchesPlanType && matchesTitle;
+    });
 
-    return swaps;
+    const planPoint = await Subscription.findOne({ planName: planType}) as any
+    const userResult = await User.findById(user.userId) as any
+    
+    
+    const result = filteredSwaps.map(swap => {
+      const myPoints =
+        swap.userTo.toString() === user.userId
+          ? swap.swapUserToPoint
+          : swap.userFrom.toString() === user.userId
+          ? swap.swapUserFromPoint
+          : 0;
+
+      return {
+        swapId: swap._id,
+        myPoints,
+        productFrom: swap.productFrom,
+        productTo: swap.productTo,
+        planType: swap.plan_type,
+        isApproved: swap.isApproved
+      };
+    });
+
+    return {result, pointRangeStart: planPoint.pointRangeStart, pointRangeEnd: planPoint.pointRangeEnd, userPoint: userResult?.points};
 
   } catch (error) {
-    console.error("Error fetching swaps:", error);
-    throw new Error("Failed to fetch swaps");
+    console.error("Error fetching swap points:", error);
+    throw new Error("Failed to fetch swap points");
   }
 };
+
+
+
 
 const partnerProfileDetails = async (req: Request) => {
   const id = req.params.id;

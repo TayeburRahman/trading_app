@@ -11,4 +11,5 @@ export type ISwap = {
   swapUserToPoint:Number;
   swapUserFromPoint:Number;
   ratting:Array<IUser> ;
+  plan_type: string;
 };

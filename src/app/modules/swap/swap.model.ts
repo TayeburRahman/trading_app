@@ -34,6 +34,10 @@ const swapSchema = new Schema<ISwap>(
     swapUserFromPoint: {  
       type: Number,
     },
+    plan_type: {  
+      type: String,
+      default:"Gold"
+    },
     ratting:[
       {
         type: Schema.Types.ObjectId,

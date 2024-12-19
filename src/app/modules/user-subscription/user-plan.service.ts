@@ -250,6 +250,15 @@ const getPointList = async (req: Request) =>{
  return points
 }
 
+const getPlanSwapHistory = async (req: Request) =>{
+  const {userId} = req.params;
+  if (!userId) {
+    throw new ApiError(401, 'User not authenticated');
+  }
+  const points = await Point.findOne({user: userId});
+ return points
+}
+
 export const UpgradePlanService = {
   updateSubscription,
   AllSubscriber,
@@ -258,5 +267,6 @@ export const UpgradePlanService = {
   statusUpdateRequest,
   getSubscribeData,
   myMembership,
-  getPointList
+  getPointList,
+  getPlanSwapHistory
 };

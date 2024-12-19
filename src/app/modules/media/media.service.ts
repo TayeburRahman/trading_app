@@ -59,7 +59,6 @@ const allVideoAdds = async (query: Record<string, unknown>) => {
     data: result,
   };
 };
-
 const updateAdds = async (req: Request) => {
   const { files } = req as any;
   const id = req.params.id;
