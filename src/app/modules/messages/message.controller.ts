@@ -15,6 +15,20 @@ const sendMessage: RequestHandler = catchAsync(
   },
 );
 
+const sendMessageOne: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await messageService.sendMessageOne(req);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: `Message Send Success`,
+      data: result,
+    });
+  },
+);
+
+ 
+
 const getMessages: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const result = await messageService.getMessages(req, res);
@@ -40,4 +54,5 @@ export const messageController = {
   sendMessage,
   getMessages, 
   conversationUser,
+  sendMessageOne
 };

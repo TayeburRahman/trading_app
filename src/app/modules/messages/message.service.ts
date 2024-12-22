@@ -109,6 +109,60 @@ const sendMessage = async (senderId: any, socket: Socket, io: Server): Promise<v
   });
 };
 
+const sendMessageOne = async (req: any): Promise<void> => { 
+    try {
+     const {userId: senderId} = req.user;
+     const files = req.files;
+      const { receiverId, message, } = req.body as any;
+      console.log(files)
+
+ 
+ 
+      if (!receiverId || !senderId) {
+        throw new ApiError(404, 'Sender or Receiver user not found');
+      }
+ 
+      let conversation = await Conversation.findOne({
+        participants: { $all: [senderId, receiverId] },
+      });
+
+      if (!conversation) {
+        conversation = await Conversation.create({
+          participants: [senderId, receiverId],
+        });
+      }
+ 
+      let message_img = '';
+      if (files?.message_img && files.message_img.length > 0) {
+        message_img = `/images/message/${files.message_img[0].filename}`;
+      }
+ 
+ 
+      const newMessage = new Message({
+        senderId,
+        receiverId,
+        message,
+        message_img,
+        conversationId: conversation._id,
+      });  
+ 
+      conversation.messages.push(newMessage._id);
+ 
+      await Promise.all([conversation.save(), newMessage.save()]);
+
+      
+ 
+       //@ts-ignore
+      const socketIo = global.io;
+      if (socketIo && conversation && newMessage) {
+        // console.log("dfsklmjkvfdngvbrfgb", newMessage)
+        socketIo.to(receiverId.toString()).emit('new-message', newMessage);
+        socketIo.to(senderId.toString()).emit('new-message', newMessage);
+      }
+    } catch (error: any) {
+      console.error('Error sending message:', error); 
+    } 
+}; 
 
 const getMessages = async (req: Request, res: Response) => {
   try {
@@ -153,7 +207,6 @@ const getMessages = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
- 
 
 const conversationUser = async (req: any) => {
   const { userId } = req.params;
@@ -197,4 +250,5 @@ export const messageService = {
   sendMessage,
   getMessages,
   conversationUser,
+  sendMessageOne
 };

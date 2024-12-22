@@ -20,8 +20,7 @@ const messageSchema = new mongoose.Schema<IMessage>(
     },
 
     message: {
-      type: String,
-      required: true,
+      type: String, 
     },
     message_img: {
       type: String, 

@@ -10,11 +10,10 @@ import { uploadFile } from '../../middlewares/fileUploader';
 const router = express.Router();
 
 router.post(
-  '/send-message/:id', 
-  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.USER,ENUM_USER_ROLE.ADMIN),
-  // validateRequest(MessageValidation.messages),
+  '/send-message', 
+  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.USER,ENUM_USER_ROLE.ADMIN), 
   uploadFile(),
-  messageController.sendMessage,
+  messageController.sendMessageOne,
 );
 router.get(
   '/get-conversation/:userId', 
