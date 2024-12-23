@@ -28,13 +28,13 @@ export const uploadFile = () => {
         file.mimetype === 'image/jpeg' ||
         file.mimetype === 'image/png' ||
         file.mimetype === 'image/jpg' ||
-        // file.mimetype === 'image/webp' ||
+        file.mimetype === 'image/webp' ||
         file.mimetype === 'video/mp4'
       ) {
         cb(null, uploadPath);
       } else {
         //@ts-ignore
-        cb(new Error('Invalid file type'));
+        cb(new Error(`Invalid file type: ${file.mimetype}. Allowed types are JPEG, PNG, JPG, WEBP, and MP4.`));
       }
     },
     filename: function (req, file, cb) {
@@ -67,10 +67,10 @@ export const uploadFile = () => {
       ) {
         cb(null, true);
       } else {
-        cb(new Error('Invalid file type'));
+        cb(new Error(`Invalid file type: ${file.mimetype}. Allowed types are JPEG, PNG, JPG, WEBP, and MP4.`));
       }
     } else {
-      cb(new Error('Invalid fieldname'));
+      cb(new Error(`Invalid fieldname: ${file.fieldname}. Allowed fieldnames are ${allowedFieldnames.join(', ')}.`));
     }
   };
 

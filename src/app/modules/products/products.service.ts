@@ -10,6 +10,8 @@ import { Request } from 'express';
 import Notification from '../notifications/notifications.model';
 import { IUser } from '../auth/auth.interface';
 import { makeProductPoints, makeSwapPoints } from '../points/points.services';
+import { Ratting } from '../rattings/rattings.model';
+import { Types } from 'mongoose';
 
 const insertIntoDB = async (
   files: any,
@@ -68,7 +70,7 @@ const products = async (query: Record<string, unknown>) => {
   const userId = query.userId;
 
   const categoryQuery = new QueryBuilder(Product.find(), query)
-    .search([])
+    .search(['title'])
     .filter()
     .sort()
     .paginate()
@@ -183,7 +185,21 @@ const singleProduct = async (req: Request) => {
   });
   const point = await makeProductPoints(result, user.userType)
 
-  return { product: result, similarProduct, point };
+  const rattingDB : any = await Ratting.aggregate([
+    { $match: { swapOwner: new Types.ObjectId(result?.user._id) } },
+    {
+      $group: {
+        _id: '$swapOwner',
+        averageRating: { $avg: '$ratting' },
+      },
+    },
+  ]);
+
+  let average_rating = 0; 
+  if (rattingDB?.length > 0) {
+    average_rating = Number(rattingDB[0].averageRating.toFixed(2)); 
+  }  
+  return { product: result, similarProduct, point, ratting:average_rating};
 };
 
 const productForSwap = async (req: Request) => {

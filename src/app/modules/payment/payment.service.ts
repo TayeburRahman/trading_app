@@ -32,6 +32,8 @@ const paymentSuccessAndSave = async (payload: {
   package_id: string;
 }) => {
 
+  console.log("Payment success", payload.amount, payload.user, payload.transaction_id, payload.plan_id)
+
   const requiredFields = ["amount", "user", "transaction_id", "plan_id", "package_id"] as const;
 
   for (const field of requiredFields) {
@@ -64,6 +66,8 @@ const paymentSuccessAndSave = async (payload: {
   if (!update) {
     throw new ApiError(404, "Plan not found.");
   }
+
+  console.log(update);
 
   return { payment: result, plan: update };
 };

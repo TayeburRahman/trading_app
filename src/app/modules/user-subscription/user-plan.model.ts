@@ -34,6 +34,19 @@ const subscriptionSchema = new Schema<IUpgradePlan>({
       default: 'pending',
       enum: ['pending', 'resubmit', 'decline', 'approved'],
     },
+    transactionId: {
+      type: String,
+    },
+    payment_status: {
+      type: String,
+      required: true,
+      enum: ['paid', 'unpaid', 'trial'],
+      default: 'unpaid',
+    },
+    active:{
+      type: Boolean,
+      default: false,
+    },
     orderId: {
       type: String,
     },
@@ -130,18 +143,6 @@ const subscriptionSchema = new Schema<IUpgradePlan>({
     declineReason: {
       type: String,
     },
-    transactionId: {
-      type: String,
-    },
-    payment_status: {
-      type: String,
-      required: true,
-      enum: ['paid', 'unpaid', 'trial'],
-    },
-    active:{
-      type: Boolean,
-      default: false,
-    }
   },
   {
     timestamps: true,

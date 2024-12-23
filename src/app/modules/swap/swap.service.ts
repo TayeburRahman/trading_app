@@ -13,6 +13,7 @@ import { makeSwapPoints } from '../points/points.services';
 import Notification from '../notifications/notifications.model';
 import { Ratting } from '../rattings/rattings.model';
 import { Types } from 'mongoose';
+import { Plan } from '../user-subscription/user-plan.model';
 
 const makeSwap = async (req: Request) => {
   const user: any = req.user as IReqUser;
@@ -21,6 +22,12 @@ const makeSwap = async (req: Request) => {
   const isExistUSer = await User.findById(user.userId);
   if (!isExistUSer) {
     throw new ApiError(404, 'Requested User not found');
+  }
+
+  const subscription = await Plan.findOne({ user_id: user.userId }).populate("plan_id");
+
+  if(!subscription?.active === true) {
+    throw new ApiError(404, 'You do not have an active subscription plan. Please subscribe to a plan to proceed.');
   }
 
   if (!payload.productFrom || !payload.productTo || !payload.userTo) {
@@ -34,6 +41,12 @@ const makeSwap = async (req: Request) => {
 
   if (payload.userTo === user.userId) {
     throw new ApiError(400, 'You cannot swap a product with yourself.');
+  }
+
+  const subscriptionTo = await Plan.findOne({ user_id:  payload.userTo}).populate("plan_id");
+
+  if(!subscriptionTo?.active === true) {
+    throw new ApiError(404, 'User dost have an active subscription plan. Please find another products.');
   }
 
   const result = await Swap.create({

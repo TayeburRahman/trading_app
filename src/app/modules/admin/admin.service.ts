@@ -4,6 +4,7 @@
 import ApiError from '../../../errors/ApiError';
 import { IRegistration, IReqUser } from '../auth/auth.interface';
 import User from '../auth/auth.model';
+import { Plan } from '../user-subscription/user-plan.model';
 
 //!
 const registerAdmin = async (payload: IRegistration) => {
@@ -36,12 +37,15 @@ const getMyProfile = async (req: Request) => {
     throw new ApiError(401, 'User not authenticated');
   }
   const result = await User.findById(userId);
+  const plan = await Plan.findOne({plan_id: userId, active: true})
+
+  console.log("=====", plan)
 
   if (!result) {
     throw new ApiError(404, 'Profile not found');
   }
 
-  return result;
+  return {result, planStartDate: plan?.planStartDate, planEndDate: plan?.planEndDate};
 };
 
 const getUserProfile = async (req: any) => {

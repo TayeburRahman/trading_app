@@ -14,6 +14,7 @@ import { logger } from '../../../shared/logger';
 import { Point } from '../points/points.model';
 import { IPoints } from '../points/points.interface';
 import { ISubscriptions } from '../subscriptions/subscriptions.interface';
+import { Swap } from '../swap/swap.model';
 
 cron.schedule('* * * * *', async () => {
   try {
@@ -254,8 +255,12 @@ const getPlanSwapHistory = async (req: Request) =>{
   const {userId} = req.params;
   if (!userId) {
     throw new ApiError(401, 'User not authenticated');
-  }
+  } 
   const points = await Point.findOne({user: userId});
+
+  const swapHistory = await Swap.find({
+    
+  })
  return points
 }
 
