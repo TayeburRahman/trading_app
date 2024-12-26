@@ -1,9 +1,11 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+import { Types } from 'mongoose';
 import ApiError from '../../../errors/ApiError';
 import { IRegistration, IReqUser } from '../auth/auth.interface';
 import User from '../auth/auth.model';
+import { Ratting } from '../rattings/rattings.model';
 import { Plan } from '../user-subscription/user-plan.model';
 
 //!
@@ -37,15 +39,29 @@ const getMyProfile = async (req: Request) => {
     throw new ApiError(401, 'User not authenticated');
   }
   const result = await User.findById(userId);
-  const plan = await Plan.findOne({plan_id: userId, active: true})
-
-  console.log("=====", plan)
+  const plan = await Plan.findOne({user_id: userId, active: true})
+  
 
   if (!result) {
     throw new ApiError(404, 'Profile not found');
   }
 
-  return {result, planStartDate: plan?.planStartDate, planEndDate: plan?.planEndDate};
+  const rattingDB : any = await Ratting.aggregate([
+    { $match: { swapOwner: new Types.ObjectId(userId) } },
+    {
+      $group: {
+        _id: '$swapOwner',
+        averageRating: { $avg: '$ratting' },
+      },
+    },
+  ]);
+
+  let average_rating = 0; 
+  if (rattingDB?.length > 0) {
+    average_rating = Number(rattingDB[0].averageRating.toFixed(2)); 
+  }   
+
+  return {result, planStartDate: plan?.planStartDate, planEndDate: plan?.planEndDate,  ratting:average_rating};
 };
 
 const getUserProfile = async (req: any) => {

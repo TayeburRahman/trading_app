@@ -1,6 +1,7 @@
 import { logger } from '../../../shared/logger';
 import User from '../auth/auth.model';
 import Notification from '../notifications/notifications.model';
+import { Payment } from '../payment/payment.model';
 import { Subscription } from '../subscriptions/subscriptions.model';
 import { Plan } from '../user-subscription/user-plan.model';
 
@@ -13,7 +14,7 @@ const getYearRange = (year: any) => {
 const totalCount = async () => {
   const totalUser = await User.countDocuments({ role: 'USER' });
 
-  const totalIncome = await Plan.aggregate([
+  const totalIncome = await Payment.aggregate([
     {
       $group: {
         _id: null,

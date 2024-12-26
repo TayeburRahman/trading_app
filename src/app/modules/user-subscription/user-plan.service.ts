@@ -15,6 +15,7 @@ import { Point } from '../points/points.model';
 import { IPoints } from '../points/points.interface';
 import { ISubscriptions } from '../subscriptions/subscriptions.interface';
 import { Swap } from '../swap/swap.model';
+import mongoose from 'mongoose';
 
 cron.schedule('* * * * *', async () => {
   try {
@@ -39,69 +40,80 @@ cron.schedule('* * * * *', async () => {
 });
 
 const createSubscription = async (req: Request) => {
-  let data = req.body;
-  const {userId}=  req.user as IReqUser;
+  const data = req.body;
+  const { userId } = req.user as IReqUser;
+
+  if (!data.plan_id || !data.plan_type) {
+    throw new ApiError(400, 'Plan ID and Plan Type are required');
+  }
 
   const checkUser = await User.findById(userId);
-
   if (!checkUser) {
     throw new ApiError(404, 'User not found');
   }
 
   const subscriptionPlan = await Subscription.findById(data.plan_id) as ISubscriptions;
-
   if (!subscriptionPlan) {
     throw new ApiError(404, 'Plan not found');
   }
 
   const startDate = new Date();
-
-  const endDate = new Date(
-    startDate.getTime() + subscriptionPlan.duration * 24 * 60 * 60 * 1000,
-  );
+  const endDate = new Date(startDate);
+  endDate.setMonth(endDate.getMonth() + 1);
+ 
+  
   data.planStartDate = startDate;
   data.planEndDate = endDate;
-  data.user_id = req?.user?.userId;
+  data.user_id = userId;
 
-  // console.log("UPDATE ++++++",data)
-  // console.log("====checkUser=======",data)
+  try {
+    const existingPlan = await Plan.findOne({  payment_status: { $in: ['unpaid', 'trial'] } });
 
-  const existingPlan = await Plan.findOne({
-    user_id: userId,
-    payment_status: { $in: ["unpaid", "trial"] }
-  });
+    console.log("existingPlan", existingPlan)
 
-  if(existingPlan) {
-   await Plan.deleteOne({ user_id: userId,   payment_status: { $in: ["unpaid", "trial"] } });
+    if (existingPlan) {
+      await Plan.deleteMany(
+        { payment_status: { $in: ['unpaid', 'trial'] } });
+    }
+
+    data.payment_status = data.plan_type === 'Trial' ? 'trial' : 'unpaid';
+    const subscription = await Plan.create([data]) as any;
+
+   
+
+    checkUser.userType = data.plan_type;
+    checkUser.planExpatDate = endDate;
+    await checkUser.save( );
+
+    const notifications = [
+      {
+        user: checkUser._id,
+        title: 'Subscription Plan Request!',
+        message: `Request Unlock New Plan From ${checkUser.name} on ${subscriptionPlan.planName} Subscription Successful.`,
+      },
+      {
+        admin: true,
+        plan_id: subscription?._id,
+        title: 'New user applied!',
+        message: `A new user has applied for ${subscriptionPlan.planName} membership packages and waiting for approval, review the application for approval.`,
+      },
+    ];
+
+    await Notification.create(notifications);
+
+    //@ts-ignore
+    global.io.to(checkUser._id.toString()).emit('notification', notifications);
+
+    return {
+      message: 'Subscription created successfully',
+      subscription,
+    };
+  } catch (error) {
+    console.error('Transaction error:', error);
+    throw error;
   }
-
-  const paymentStatus = data.plan_type === "Trial" ? "trial" : "unpaid";
-  data.payment_status = paymentStatus;
-
-  const subscription = await Plan.create(data); 
-  
-  checkUser.userType = data.plan_type
-  checkUser.planExpatDate = endDate
-  await checkUser.save();
-
-  const notification = await Notification.create({
-    user: checkUser?._id,
-    title: 'Subscription Plan Request!',
-    message: `Request Unlock New Plan From ${checkUser?.name} on ${subscriptionPlan?.planName} Subscription Successful.`,
-  });
-
-  await Notification.create({
-    admin: true,
-    plan_id: subscription._id,
-    title: 'New user applied!',
-    message: `A new user has applied for ${subscriptionPlan?.planName} membership packages and waiting for approval, review the application for approval.`,
-  });
-
-  //@ts-ignore
-  global.io.to(checkUser?._id.toString()).emit('notification', notification);
-
-  return subscription;
 };
+
 
 const updateSubscription = async (req: Request) => {
   const { id } = req.params;
@@ -150,67 +162,96 @@ const getSubscribeData = async (params: Record<string, unknown>) => {
   return subscriptionsQuery;
 };
 
+// ----
 const statusUpdateRequest = async (req: Request) => {
   const { id } = req.params;
   const { status } = req.query;
   const { reason } = req.body;
 
-  if (
-    !id ||
-    !status ||
-    !['padding', 'decline', 'approved'].includes(status as string)
-  ) {
-    throw new ApiError(400, 'Invalid ID or status');
+  console.log("Received Request:", { id, status, reason });
+
+  // Validate input
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new ApiError(400, 'Invalid ID format');
+  }
+  if (!status || !['padding', 'decline', 'approved'].includes(status as string)) {
+    throw new ApiError(400, 'Invalid status value');
   }
 
   const plan: any = await Plan.findById(id).populate('plan_id');
-
-  if (status === 'decline') {
-    if (!reason) {
-      throw new ApiError(400, 'Reason is required!');
-    }
-
-    const notification = await Notification.create({
-      title: 'Subscription Application Declined.',
-      user: plan.user_id,
-      plan_id: plan._id,
-      message: `We regret to inform you that your application has been declined. Reason: ${reason}. Please correct your information and resubmit.`,
-    });
-
-    //@ts-ignore
-    const socketIo = global.io;
-    if (socketIo) {
-      socketIo.emit(`notification::${plan.user_id.toString()}`, notification);
-    }
-  }
-
-  if (status === 'approved') {
-    const notification = await Notification.create({
-      title: 'Subscription Application Update.',
-      user: plan.user_id,
-      plan_id: plan._id,
-      message: `Your subscription application has been approved. Please complete your payment ${plan.plan_id.fee} to activate your plan.`,
-    });
-
-    //@ts-ignore
-    const socketIo = global.io;
-    if (socketIo) {
-      socketIo.emit(`notification::${plan.user_id.toString()}`, notification);
-    }
-  }
-
-  const updatedPlan = await Plan.findByIdAndUpdate(
-    id,
-    { status, declineReason: reason, active: true },
-    { new: true, runValidators: true },
-  );
-
-  if (!updatedPlan) {
+  if (!plan) {
     throw new ApiError(404, 'Plan not found');
   }
 
+  // Decline status logic
+  if (status === 'decline') {
+    if (!reason) {
+      throw new ApiError(400, 'Reason is required for declining');
+    }
+
+    await sendNotification(
+      plan.user_id,
+      'Subscription Application Declined.',
+      `We regret to inform you that your application has been declined. Reason: ${reason}. Please correct your information and resubmit.`,
+      plan._id
+    );
+  }
+
+  // Prevent duplicate approval
+  if (plan?.status === 'approved') {
+    throw new ApiError(400, 'Plan already approved');
+  }
+
+  // Approved status logic
+  if (status === 'approved') {
+    await sendNotification(
+      plan.user_id,
+      'Subscription Application Update.',
+      `Your subscription application has been approved. Please complete your payment ${plan.plan_id.fee} to activate your plan.`,
+      plan._id
+    );
+  }
+
+  // Update plan
+  const updatedPlan = await Plan.findByIdAndUpdate(
+    id,
+    {
+      status,
+      ...(status === 'decline' ? { declineReason: reason } : {}),
+      active: status === 'approved',
+    },
+    { new: true, runValidators: true }
+  );
+
+  if (!updatedPlan) {
+    throw new ApiError(404, 'Plan not found during update');
+  }
+ 
+
   return updatedPlan;
+};  
+const sendNotification = async (
+  userId: string,
+  title: string,
+  message: string,
+  planId: string
+) => {
+  const notification = await Notification.create({
+    title,
+    user: userId,
+    plan_id: planId,
+    message,
+  });
+
+  //@ts-ignore
+  const socketIo = global.io;
+  if (socketIo) {
+    socketIo.emit(`notification::${userId}`, notification);
+  } else {
+    console.error('Socket.io is not initialized');
+  }
 };
+// ----
 
 const mySubscription = async (req: Request) => {
   const { userId } = req.user as IReqUser;

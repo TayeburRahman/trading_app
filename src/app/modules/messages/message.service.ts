@@ -113,8 +113,7 @@ const sendMessageOne = async (req: any): Promise<void> => {
     try {
      const {userId: senderId} = req.user;
      const files = req.files;
-      const { receiverId, message, } = req.body as any;
-      console.log(files)
+      const { receiverId, message, } = req.body as any; 
 
  
  
@@ -195,8 +194,11 @@ const getMessages = async (req: Request, res: Response) => {
 
     const totalPages = Math.ceil(totalMessages / limitMessages);
 
+    const userDetails = await User.findById(receiverId)
+
     return res.status(200).json({
-      messages,
+      userDetails,
+      messages, 
       totalMessages,
       totalPages,
       currentPage: Number(page),

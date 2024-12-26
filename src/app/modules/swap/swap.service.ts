@@ -14,6 +14,7 @@ import Notification from '../notifications/notifications.model';
 import { Ratting } from '../rattings/rattings.model';
 import { Types } from 'mongoose';
 import { Plan } from '../user-subscription/user-plan.model';
+import Conversation from '../messages/conversation.model';
 
 const makeSwap = async (req: Request) => {
   const user: any = req.user as IReqUser;
@@ -23,12 +24,14 @@ const makeSwap = async (req: Request) => {
   if (!isExistUSer) {
     throw new ApiError(404, 'Requested User not found');
   }
-
+   
   const subscription = await Plan.findOne({ user_id: user.userId }).populate("plan_id");
 
-  if(!subscription?.active === true) {
+  if (!subscription?.active) {
     throw new ApiError(404, 'You do not have an active subscription plan. Please subscribe to a plan to proceed.');
   }
+
+  console.log("payload", payload)
 
   if (!payload.productFrom || !payload.productTo || !payload.userTo) {
     throw new ApiError(400, 'Product or User is missing');
@@ -45,8 +48,10 @@ const makeSwap = async (req: Request) => {
 
   const subscriptionTo = await Plan.findOne({ user_id:  payload.userTo}).populate("plan_id");
 
-  if(!subscriptionTo?.active === true) {
-    throw new ApiError(404, 'User dost have an active subscription plan. Please find another products.');
+  console.log("package_id", subscriptionTo?.active)
+
+  if (!subscriptionTo?.active) {
+    throw new ApiError(404, 'User does not have an active subscription plan. Please find another user.');
   }
 
   const result = await Swap.create({
@@ -69,6 +74,16 @@ const makeSwap = async (req: Request) => {
   const socketIo = global.io;
   if (socketIo) {
     socketIo.emit(`notification::${notification?._id.toString()}`, notification);
+  }
+ 
+  let conversation = await Conversation.findOne({
+    participants: { $all: [user.userId, payload.userTo] },
+  });
+
+  if (!conversation) {
+    conversation = await Conversation.create({
+      participants: [user.userId, payload.userTo],
+    });
   }
 
   return result
