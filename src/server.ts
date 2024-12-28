@@ -30,7 +30,7 @@ async function main() {
         origin: '*',
       },
     });
-    
+
     socket(socketIO);
 
     //@ts-ignore
