@@ -30,7 +30,13 @@ app.use(
       "http://103.145.138.200:3002",
       "http://138.197.37.38:3002",
       "http://138.197.37.38:3001",
-      "http://138.197.37.38:3006"
+      "http://138.197.37.38:3006",
+      "http://138.197.37.38:4173",
+      "https://swiftswapp.com",
+      "https://www.swiftswapp.com",
+      "https://dashboard.swiftswapp.com",
+      "https://www.dashboard.swiftswapp.com",
+
     ],
     credentials: true,
   }),
