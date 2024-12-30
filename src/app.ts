@@ -36,7 +36,6 @@ app.use(
       "https://www.swiftswapp.com",
       "https://dashboard.swiftswapp.com",
       "https://www.dashboard.swiftswapp.com",
-
     ],
     credentials: true,
   }),

@@ -42,49 +42,48 @@ cron.schedule('* * * * *', async () => {
 const createSubscription = async (req: Request) => {
   const data = req.body;
   const { userId } = req.user as IReqUser;
-
+ 
   if (!data.plan_id || !data.plan_type) {
     throw new ApiError(400, 'Plan ID and Plan Type are required');
   }
-
+ 
   const checkUser = await User.findById(userId);
   if (!checkUser) {
     throw new ApiError(404, 'User not found');
   }
-
+ 
   const subscriptionPlan = await Subscription.findById(data.plan_id) as ISubscriptions;
   if (!subscriptionPlan) {
     throw new ApiError(404, 'Plan not found');
   }
-
+ 
   const startDate = new Date();
   const endDate = new Date(startDate);
-  endDate.setMonth(endDate.getMonth() + 1);
- 
-  
+  endDate.setMonth(endDate.getMonth() + 1);  
+
   data.planStartDate = startDate;
   data.planEndDate = endDate;
   data.user_id = userId;
 
-  try {
-    const existingPlan = await Plan.findOne({  payment_status: { $in: ['unpaid', 'trial'] } });
-
-    console.log("existingPlan", existingPlan)
-
-    if (existingPlan) {
-      await Plan.deleteMany(
-        { payment_status: { $in: ['unpaid', 'trial'] } });
+  try { 
+    const userPlan = await Plan.findOne({ user_id: userId });
+    if (userPlan?.payment_status === 'trial') {
+      throw new ApiError(400, 'User already has a trial plan');
     }
-
+ 
+    const existingPlan = await Plan.findOne({ user_id: userId, payment_status: { $in: ['unpaid', 'trial'] } });
+    if (existingPlan) {
+      await Plan.deleteMany({ user_id: userId, payment_status: { $in: ['unpaid', 'trial'] } });
+    }
+ 
     data.payment_status = data.plan_type === 'Trial' ? 'trial' : 'unpaid';
+ 
     const subscription = await Plan.create([data]) as any;
-
-   
-
+ 
     checkUser.userType = data.plan_type;
     checkUser.planExpatDate = endDate;
-    await checkUser.save( );
-
+    await checkUser.save();
+ 
     const notifications = [
       {
         user: checkUser._id,
@@ -98,9 +97,8 @@ const createSubscription = async (req: Request) => {
         message: `A new user has applied for ${subscriptionPlan.planName} membership packages and waiting for approval, review the application for approval.`,
       },
     ];
-
+ 
     await Notification.create(notifications);
-
     //@ts-ignore
     global.io.to(checkUser._id.toString()).emit('notification', notifications);
 
@@ -108,12 +106,11 @@ const createSubscription = async (req: Request) => {
       message: 'Subscription created successfully',
       subscription,
     };
-  } catch (error) {
-    console.error('Transaction error:', error);
-    throw error;
+  } catch (error : any) {
+    console.error('Transaction error:', error.message);  
+    throw new ApiError(500, 'Failed to create subscription');
   }
-};
-
+}; 
 
 const updateSubscription = async (req: Request) => {
   const { id } = req.params;
