@@ -1,0 +1,50 @@
+import { Schema } from 'mongoose';
+
+type SubscriptionStatus = 'paid' | 'unpaid' | 'trial';
+type SubscriptionPlan = 'Trial' | 'Gold' | 'Platinum' | 'Diamond';
+type SubscriptionState = 'decline' | 'approved' | 'pending';
+
+export type IUpgradePlan = {
+  user_id: Schema.Types.ObjectId;
+  plan_id: Schema.Types.ObjectId;
+  planStartDate: Date;
+  planEndDate: Date;
+  payment_status: SubscriptionStatus;
+  plan_type: SubscriptionPlan;
+  status: SubscriptionState;
+  transactionId?: string;
+  orderId: string;
+  amount: number;
+  name: string;
+  date_of_birth: Date;
+  place_of_birth: string;
+  license_number: string;
+  passport_number: string;
+  email: string;
+  phone_number: string;
+  profession: string;
+  region: string;
+  haveChildren: string;
+  havePets: string;
+  haveVehicle: string;
+  willingVehicle: string;
+  ownerOfProperty: string;
+  ableApproveForm: string;
+  propertyInsured: string;
+  utilitiesUptoDate: string;
+  aboutSwap: string;
+  departureArrival: string;
+  datesOfTravel: Date;
+  startDestination: string;
+  startState: string;
+  travelStartCounty: string;
+  travelStartCountry: string;
+  endDestination: string;
+  endState: string;
+  endCounty: string;
+  endCountry: string;
+  purposeOfTravel: string;
+  religion: string;
+  declineReason: string;
+  active: boolean
+};
