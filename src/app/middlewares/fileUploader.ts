@@ -20,30 +20,39 @@ export const uploadFile = () => {
         uploadPath = 'uploads/images/message';
       } else if (file.fieldname === 'video') {
         uploadPath = 'uploads/video';
+      } else if (file.fieldname === 'audio') {
+        uploadPath = 'uploads/audio';
+      } else if (file.fieldname === 'document') {
+        uploadPath = 'uploads/documents';
       } else {
-        uploadPath = 'uploads';
+        uploadPath = 'uploads/others';
       }
 
-      if (
-        file.mimetype === 'image/jpeg' ||
-        file.mimetype === 'image/png' ||
-        file.mimetype === 'image/jpg' ||
-        file.mimetype === 'image/webp' ||
-        file.mimetype === 'video/mp4'
-      ) {
-        cb(null, uploadPath);
-      } else {
-        //@ts-ignore
-        cb(new Error(`Invalid file type: ${file.mimetype}. Allowed types are JPEG, PNG, JPG, WEBP, and MP4.`));
-      }
+      cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
-      const name = Date.now() + '-' + file.originalname;
+      // Remove problematic characters from the original filename
+      const sanitizedFilename = file.originalname.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9._-]/g, '');
+      const name = Date.now() + '-' + sanitizedFilename;
       cb(null, name);
     },
   });
 
   const fileFilter = (req: Request, file: any, cb: any) => {
+    const allowedMimetypes = [
+      'image/jpeg',
+      'image/png',
+      'image/jpg',
+      'image/webp',
+      'image/gif',
+      'image/svg+xml',
+      'image/tiff',
+      'image/bmp',
+      'video/mp4',
+      'audio/mpeg',
+      'audio/wav', 
+    ];
+
     const allowedFieldnames = [
       'image',
       'profile_image',
@@ -53,21 +62,17 @@ export const uploadFile = () => {
       'thumbnail',
       'video_thumbnail',
       'message_img',
+      'audio',
+      'document',
     ];
 
     if (file.fieldname === undefined) {
       cb(null, true);
     } else if (allowedFieldnames.includes(file.fieldname)) {
-      if (
-        file.mimetype === 'image/jpeg' ||
-        file.mimetype === 'image/png' ||
-        file.mimetype === 'image/jpg' ||
-        file.mimetype === 'image/webp' ||
-        file.mimetype === 'video/mp4'
-      ) {
+      if (allowedMimetypes.includes(file.mimetype)) {
         cb(null, true);
       } else {
-        cb(new Error(`Invalid file type: ${file.mimetype}. Allowed types are JPEG, PNG, JPG, WEBP, and MP4.`));
+        cb(new Error(`Invalid file type: ${file.mimetype}. Allowed types are ${allowedMimetypes.join(', ')}.`));
       }
     } else {
       cb(new Error(`Invalid fieldname: ${file.fieldname}. Allowed fieldnames are ${allowedFieldnames.join(', ')}.`));
@@ -82,7 +87,9 @@ export const uploadFile = () => {
     { name: 'product_img', maxCount: 10 },
     { name: 'cover_image', maxCount: 1 },
     { name: 'profile_image', maxCount: 1 },
-    { name: 'video', maxCount: 1 },
+    { name: 'video', maxCount: 5 },
+    { name: 'audio', maxCount: 5 },
+    { name: 'document', maxCount: 10 },
     { name: 'video_thumbnail', maxCount: 1 },
     { name: 'thumbnail', maxCount: 1 },
     { name: 'message_img', maxCount: 10 },

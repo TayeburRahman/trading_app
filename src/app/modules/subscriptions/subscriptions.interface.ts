@@ -7,4 +7,5 @@ export type ISubscriptions = {
   positiveCommentPoint: number;
   negativeCommentPoint: number;
   duration: number;
+  productPriceLimit: number;
 };
