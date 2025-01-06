@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Request } from 'express';
 import multer from 'multer';
+import fs from 'fs'; // Import the fs module
 
 export const uploadFile = () => {
   const storage = multer.diskStorage({
@@ -28,8 +29,14 @@ export const uploadFile = () => {
         uploadPath = 'uploads/others';
       }
 
+      // Ensure the directory exists
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true });
+      }
+
       cb(null, uploadPath);
     },
+
     filename: function (req, file, cb) {
       // Remove problematic characters from the original filename
       const sanitizedFilename = file.originalname.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9._-]/g, '');
@@ -50,7 +57,7 @@ export const uploadFile = () => {
       'image/bmp',
       'video/mp4',
       'audio/mpeg',
-      'audio/wav', 
+      'audio/wav',
     ];
 
     const allowedFieldnames = [
