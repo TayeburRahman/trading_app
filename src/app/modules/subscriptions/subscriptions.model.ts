@@ -32,6 +32,10 @@ const subscriptionsSchema = new Schema<ISubscriptions>(
       type: Number,
       required: true,
     },
+    productPriceLimit: {
+      type: Number,
+      required: true,
+    },
     duration: {
       type: Number,
       default: 1,
