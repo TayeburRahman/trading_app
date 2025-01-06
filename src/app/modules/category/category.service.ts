@@ -16,7 +16,7 @@ const insertIntoDB = async (files: any, payload: ICategory) => {
     throw new ApiError(400, 'Category already exist');
   }
   if (files?.image) {
-    payload.image = `/images/catagorys/${files.image[0].filename}`;
+    payload.image = `/images/image/${files.image[0].filename}`;
   }
   return await Category.create(payload);
 };
