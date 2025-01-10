@@ -4,4 +4,5 @@ node_modules
 logs/
 dist/
 entrypoint.sh
-yarn.locksrc/app/modules/push-notification/firebase.config.update.json
+yarn.lock
+src/app/modules/push-notification/firebase.config.update.json
