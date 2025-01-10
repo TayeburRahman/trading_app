@@ -5,6 +5,7 @@ import Message from './message.model';
 import ApiError from '../../../errors/ApiError';
 import User from '../auth/auth.model'; 
 import { Server, Socket } from 'socket.io';
+import { sendPushNotification } from '../push-notification/push.notifications';
 
 //* One to one conversation
 // const sendMessage = async (req: Request) => {
@@ -61,8 +62,7 @@ interface NewMessageData {
 
 const sendMessage = async (senderId: any, socket: Socket, io: Server): Promise<void> => {
   socket.on('new-message', async (data: NewMessageData) => {
-    try {
-      // console.log("senderId", senderId)
+    try { 
       const { receiverId, message, userType, files } = data as any;
  
       if (!receiverId || !senderId) {
@@ -148,9 +148,17 @@ const sendMessageOne = async (req: any): Promise<void> => {
       conversation.messages.push(newMessage._id);
  
       await Promise.all([conversation.save(), newMessage.save()]);
+       
+      const dbReceiver = await User.findById(receiverId)
+      if(dbReceiver?.deviceToken){
+        const payload = {
+          title: `${dbReceiver.name} Send New Message.`,
+          body: `${message}`
+        };
+        
+        sendPushNotification({ fcmToken: dbReceiver?.deviceToken, payload });
+      }
 
-      
- 
        //@ts-ignore
       const socketIo = global.io;
       if (socketIo && conversation && newMessage) {

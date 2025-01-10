@@ -16,6 +16,7 @@ import { IPoints } from '../points/points.interface';
 import { ISubscriptions } from '../subscriptions/subscriptions.interface';
 import { Swap } from '../swap/swap.model';
 import mongoose from 'mongoose';
+import { sendPushNotification } from '../push-notification/push.notifications';
 
 cron.schedule('* * * * *', async () => {
   try {
@@ -239,6 +240,15 @@ const sendNotification = async (
     plan_id: planId,
     message,
   });
+
+  const dbReceiver = await User.findById(userId)
+  if(dbReceiver?.deviceToken){
+    const payload = {
+      title:  title,
+      body: message
+    };  
+    sendPushNotification({ fcmToken: dbReceiver?.deviceToken, payload });
+  }
 
   //@ts-ignore
   const socketIo = global.io;

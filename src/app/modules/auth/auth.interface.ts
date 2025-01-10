@@ -42,6 +42,7 @@ export type IUser = {
   email: string;
   phone_number: string;
   password: string;
+  deviceToken: string;
   address: string;
   role: 'ADMIN' | 'SUPER_ADMIN' | 'USER';
   profile_image: string;

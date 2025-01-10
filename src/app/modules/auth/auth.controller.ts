@@ -20,7 +20,7 @@ const registrationUser: RequestHandler = catchAsync(
 
 const activateUser: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await AuthService.activateUser(req.body);
+    const result = await AuthService.activateUser(req);
     const { refreshToken } = result;
     // set refresh token into cookie
     const cookieOptions = {
@@ -63,7 +63,7 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
 
 const login = catchAsync(async (req: Request, res: Response) => {
   const { ...loginData } = req.body;
-  const result = await AuthService.loginUser(loginData);
+  const result = await AuthService.loginUser(req);
   const { refreshToken } = result;
   // set refresh token into cookie
   const cookieOptions = {

@@ -27,6 +27,7 @@ import {
 } from './auth.interface';
 import User from './auth.model';
 import { userSearchableField } from './auth.constants';
+import { sendPushNotification } from '../push-notification/push.notifications';
 
 const registrationUser = async (payload: IRegistration) => {
   const { firstName, lastName, email, password, phone_number, role, confirmPassword } =
@@ -87,8 +88,9 @@ const createActivationToken = () => {
 };
 
 //!
-const activateUser = async (payload: IActivationRequest) => {
-  const { activation_code, userEmail } = payload;
+const activateUser = async (req: Request) => {
+  const { activation_code, userEmail, deviceToken } = req.body;
+   
 
   const existUser = await User.findOne({ email: userEmail });
   if (!existUser) {
@@ -100,7 +102,7 @@ const activateUser = async (payload: IActivationRequest) => {
   }
   const user = (await User.findOneAndUpdate(
     { email: userEmail },
-    { isActive: true },
+    { isActive: true, deviceToken},
     {
       new: true,
       runValidators: true,
@@ -115,6 +117,16 @@ const activateUser = async (payload: IActivationRequest) => {
     config.jwt.secret as Secret,
     config.jwt.expires_in as string,
   );
+
+
+  const payload = {
+    title: 'Account Active Successfully.',
+    body: 'You have successfully logged in to your account.',
+  };
+  
+  sendPushNotification({ fcmToken: deviceToken, payload });
+
+
   //Create refresh token
   const refreshToken = jwtHelpers.createToken(
     { userId: existUser._id, role: existUser.role },
@@ -220,8 +232,8 @@ const deleteUser = async (id: string): Promise<IUser | null> => {
   return result;
 };
 //!
-const loginUser = async (payload: any) => {
-  const { email, password } = payload;
+const loginUser = async (req: Request) => {
+  const { email, password, deviceToken} = req.body; 
 
   const isUserExist = (await User.isUserExist(email)) as IUser;
   const checkUser = await User.findOne({ email });
@@ -241,6 +253,20 @@ const loginUser = async (payload: any) => {
       'Please active your account then try to login',
     );
   }
+
+    await User.findOneAndUpdate(
+    { email: email },
+    { deviceToken},
+    {
+      new: true, 
+    }) as IUser;
+
+  const payload = {
+    title: 'Login Successfully.',
+    body: 'You have successfully logged in to your account.',
+  };
+  
+  sendPushNotification({ fcmToken: deviceToken, payload });
 
   const { _id: userId, role } = isUserExist;
   const accessToken = jwtHelpers.createToken(

@@ -12,6 +12,7 @@ import { IUser } from '../auth/auth.interface';
 import { makeProductPoints, makeSwapPoints } from '../points/points.services';
 import { Ratting } from '../rattings/rattings.model';
 import { Types } from 'mongoose';
+import { sendPushNotification } from '../push-notification/push.notifications';
 
 const insertIntoDB = async (
   files: any,
@@ -48,11 +49,21 @@ const insertIntoDB = async (
 
   const notificationMessage = `You successfully post your add!`;
   const notification = await Notification.create({
-    title: 'View for more details.',
+    title: notificationMessage,
     user: user.userId,
     product: result?._id,
-    message: notificationMessage,
+    message: 'View for more details.',
   });
+
+  const dbReceiver = await User.findById(user.userId)
+  if(dbReceiver?.deviceToken){
+    const payload = {
+      title:  notificationMessage,
+      body: 'View for more details.'
+    }; 
+
+    sendPushNotification({ fcmToken: dbReceiver?.deviceToken, payload });
+  }
 
   //@ts-ignore
   const socketIo = global.io;

@@ -29,6 +29,10 @@ const UserSchema = new Schema<IUser, UserModel>(
       required: [true, 'Password is required'],
       select: false,
     },
+    deviceToken:{
+      type: String,
+      default: null,
+    },
     address: {
       type: String,
     },

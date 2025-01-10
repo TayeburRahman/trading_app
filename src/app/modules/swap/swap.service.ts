@@ -15,6 +15,7 @@ import { Ratting } from '../rattings/rattings.model';
 import { Types } from 'mongoose';
 import { Plan } from '../user-subscription/user-plan.model';
 import Conversation from '../messages/conversation.model';
+import { sendPushNotification } from '../push-notification/push.notifications';
 
 const makeSwap = async (req: Request) => {
   const user: any = req.user as IReqUser;
@@ -69,6 +70,15 @@ const makeSwap = async (req: Request) => {
     user: payload.userTo,
     message: notificationMessage,
   });
+
+  const dbReceiver = await User.findById(payload.userTo)
+  if(dbReceiver?.deviceToken){
+    const payload = {
+      title: notificationMessage,
+      body: `${isExistUSer.name} request you to swap!`,
+    }; 
+    sendPushNotification({ fcmToken: dbReceiver?.deviceToken, payload });
+  }
 
   //@ts-ignore
   const socketIo = global.io;
@@ -230,6 +240,15 @@ const approveSwap = async (req: Request): Promise<any> => {
     user: swap.userFrom,
     message: notificationMessage,
   });
+
+  const dbReceiver = await User.findById(swap.userFrom)
+  if(dbReceiver?.deviceToken){
+    const payload = {
+      title:notificationMessage,
+      body:`Start a chat to swap your product.`,
+    }; 
+    sendPushNotification({ fcmToken: dbReceiver?.deviceToken, payload });
+  }
 
   //@ts-ignore
   const socketIo = global.io;

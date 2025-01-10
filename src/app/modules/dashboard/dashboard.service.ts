@@ -210,6 +210,8 @@ const approveUser = async (userId: string) => {
       message: notificationMessage,
     });
 
+    
+
     //@ts-ignore
     const socketIo = global.io;
     if (socketIo) {
