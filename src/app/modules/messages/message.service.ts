@@ -96,6 +96,17 @@ const sendMessage = async (senderId: any, socket: Socket, io: Server): Promise<v
       conversation.messages.push(newMessage._id);
  
       await Promise.all([conversation.save(), newMessage.save()]);
+
+      const dbReceiver = await User.findById(receiverId) as IUser;
+      const dbSender = await User.findById(senderId) as IUser;
+  
+      if (dbReceiver?.deviceToken) {
+        const payload = {
+          title: `${dbSender.name} sent a new message.`,
+          body: `${message}`,
+        };
+        sendPushNotification({ fcmToken: dbReceiver?.deviceToken, payload });
+      }
  
        //@ts-ignore
       const socketIo = global.io;
