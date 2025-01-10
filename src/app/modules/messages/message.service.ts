@@ -6,6 +6,7 @@ import ApiError from '../../../errors/ApiError';
 import User from '../auth/auth.model'; 
 import { Server, Socket } from 'socket.io';
 import { sendPushNotification } from '../push-notification/push.notifications';
+import { IUser } from '../auth/auth.interface';
 
 //* One to one conversation
 // const sendMessage = async (req: Request) => {
@@ -148,11 +149,12 @@ const sendMessageOne = async (req: any)=> {
 
     await Promise.all([conversation.save(), newMessage.save()]);
 
-    const dbReceiver = await User.findById(receiverId);
+    const dbReceiver = await User.findById(receiverId) as IUser;
+    const dbSender = await User.findById(senderId) as IUser;
 
     if (dbReceiver?.deviceToken) {
       const payload = {
-        title: `${dbReceiver.name} sent a new message.`,
+        title: `${dbSender.name} sent a new message.`,
         body: `${message}`,
       };
       sendPushNotification({ fcmToken: dbReceiver?.deviceToken, payload });
