@@ -268,6 +268,8 @@ const loginUser = async (req: Request) => {
   
   sendPushNotification({ fcmToken: deviceToken, payload });
 
+ 
+
   const { _id: userId, role } = isUserExist;
   const accessToken = jwtHelpers.createToken(
     { userId, role, conversationId: checkUser?.conversationId },
