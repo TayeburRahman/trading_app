@@ -25,7 +25,7 @@ const makeSwap = async (req: Request) => {
   if (!isExistUSer) {
     throw new ApiError(404, 'Requested User not found');
   }
-   
+
   const subscription = await Plan.findOne({ user_id: user.userId }).populate("plan_id");
 
   if (!subscription?.active) {
@@ -47,7 +47,7 @@ const makeSwap = async (req: Request) => {
     throw new ApiError(400, 'You cannot swap a product with yourself.');
   }
 
-  const subscriptionTo = await Plan.findOne({ user_id:  payload.userTo}).populate("plan_id");
+  const subscriptionTo = await Plan.findOne({ user_id: payload.userTo }).populate("plan_id");
 
   console.log("package_id", subscriptionTo?.active)
 
@@ -60,7 +60,7 @@ const makeSwap = async (req: Request) => {
     userTo: payload.userTo,
     productFrom: payload.productFrom,
     productTo: payload.productTo,
-    plan_type:isExistUSer.userType
+    plan_type: isExistUSer.userType
   });
 
 
@@ -72,11 +72,11 @@ const makeSwap = async (req: Request) => {
   });
 
   const dbReceiver = await User.findById(payload.userTo)
-  if(dbReceiver?.deviceToken){
+  if (dbReceiver?.deviceToken) {
     const payload = {
       title: notificationMessage,
       body: `${isExistUSer.name} request you to swap!`,
-    }; 
+    };
     sendPushNotification({ fcmToken: dbReceiver?.deviceToken, payload });
   }
 
@@ -85,7 +85,7 @@ const makeSwap = async (req: Request) => {
   if (socketIo) {
     socketIo.emit(`notification::${notification?._id.toString()}`, notification);
   }
- 
+
   let conversation = await Conversation.findOne({
     participants: { $all: [user.userId, payload.userTo] },
   });
@@ -219,7 +219,7 @@ const approveSwap = async (req: Request): Promise<any> => {
       },
       { new: true, upsert: true }
     ),
-  ]); 
+  ]);
 
   const [to_product, from_product] = await Promise.all([
     Swap.findByIdAndUpdate(
@@ -242,11 +242,11 @@ const approveSwap = async (req: Request): Promise<any> => {
   });
 
   const dbReceiver = await User.findById(swap.userFrom)
-  if(dbReceiver?.deviceToken){
+  if (dbReceiver?.deviceToken) {
     const payload = {
-      title:notificationMessage,
-      body:`Start a chat to swap your product.`,
-    }; 
+      title: notificationMessage,
+      body: `Start a chat to swap your product.`,
+    };
     sendPushNotification({ fcmToken: dbReceiver?.deviceToken, payload });
   }
 
@@ -272,7 +272,7 @@ const rejectSwap = async (id: string) => {
 };
 
 const getUsersSwapProduct = async (req: Request) => {
-  const user = req.user as IReqUser; 
+  const user = req.user as IReqUser;
   const title = req.query.productName as string | undefined;
 
   try {
@@ -284,7 +284,7 @@ const getUsersSwapProduct = async (req: Request) => {
             { userTo: user.userId }
           ]
         },
-        { isApproved: 'approved' }, 
+        { isApproved: 'approved' },
       ]
     };
 
@@ -323,7 +323,7 @@ const getUsersSwapProduct = async (req: Request) => {
 const getSwapProductPlanType = async (req: Request) => {
   const user = req.user as { userId: string };
   const planType = req.query.planType as string | undefined;
-  const title = req.query.productName as string | undefined; 
+  const title = req.query.productName as string | undefined;
 
   try {
     const baseQuery: any = {
@@ -339,7 +339,7 @@ const getSwapProductPlanType = async (req: Request) => {
     };
 
     console.log("Generated Query:", JSON.stringify(baseQuery, null, 2));
- 
+
     const swaps: any[] = await Swap.find(baseQuery)
       .populate({
         path: 'productFrom',
@@ -357,28 +357,28 @@ const getSwapProductPlanType = async (req: Request) => {
           { path: 'subCategory', select: 'name' }
         ]
       });
- 
-    const filteredSwaps = swaps.filter(swap => { 
-      const matchesPlanType = planType ? swap.plan_type.toLowerCase() === planType.toLowerCase() : true; 
+
+    const filteredSwaps = swaps.filter(swap => {
+      const matchesPlanType = planType ? swap.plan_type.toLowerCase() === planType.toLowerCase() : true;
       const matchesTitle = title
         ? (swap.productFrom && new RegExp(title, 'i').test(swap.productFrom.title)) ||
-          (swap.productTo && new RegExp(title, 'i').test(swap.productTo.title))
+        (swap.productTo && new RegExp(title, 'i').test(swap.productTo.title))
         : true;
 
       return matchesPlanType && matchesTitle;
     });
 
-    const planPoint = await Subscription.findOne({ planName: planType}) as any
+    const planPoint = await Subscription.findOne({ planName: planType }) as any
     const userResult = await User.findById(user.userId) as any
-    
-    
+
+
     const result = filteredSwaps.map(swap => {
       const myPoints =
         swap.userTo.toString() === user.userId
           ? swap.swapUserToPoint
           : swap.userFrom.toString() === user.userId
-          ? swap.swapUserFromPoint
-          : 0;
+            ? swap.swapUserFromPoint
+            : 0;
 
       return {
         swapId: swap._id,
@@ -390,7 +390,7 @@ const getSwapProductPlanType = async (req: Request) => {
       };
     });
 
-    return {result, pointRangeStart: planPoint.pointRangeStart, pointRangeEnd: planPoint.pointRangeEnd, userPoint: userResult?.points};
+    return { result, pointRangeStart: planPoint.pointRangeStart, pointRangeEnd: planPoint.pointRangeEnd, userPoint: userResult?.points };
 
   } catch (error) {
     console.error("Error fetching swap points:", error);
@@ -406,13 +406,13 @@ const partnerProfileDetails = async (req: Request) => {
   if (!profile) {
     throw new ApiError(404, 'User profile not found');
   }
-  const product = await Product.find({user: id, status: "pending" })
+  const product = await Product.find({ user: id, status: "pending" })
 
 
   const ratting = await Ratting.find({ swapOwner: id })
-  .populate("swapOwner")
-  .populate("swap")
-  .populate('user')
+    .populate("swapOwner")
+    .populate("swap")
+    .populate('user')
 
 
   const result = await Ratting.aggregate([
@@ -428,13 +428,13 @@ const partnerProfileDetails = async (req: Request) => {
   let average_rating;
 
   if (result.length > 0) {
-    average_rating = Number(result[0].averageRating.toFixed(2)); 
+    average_rating = Number(result[0].averageRating.toFixed(2));
   } else {
-    average_rating = {message: 'No ratings found for this user.'}  
+    average_rating = 0;
   }
 
 
-  return {profile, product, ratting, average_rating}
+  return { profile, product, ratting, average_rating }
 
 
 }
