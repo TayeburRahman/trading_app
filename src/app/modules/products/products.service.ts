@@ -123,7 +123,7 @@ const updateProduct = async (req: Request) => {
   const id = req.params.id;
   const productImage: string[] = [];
 
-  console.log("Updated product:", files.product_img);
+  console.log("Updated product:", files?.product_img);
 
   if (files && files?.product_img && files?.product_img.length) {
     for (const image of files.product_img) {
