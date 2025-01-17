@@ -21,7 +21,7 @@ const insertIntoDB = async (
 ) => {
   if (!files?.product_img) {
     throw new ApiError(400, 'File is missing');
-  } 
+  }
   const checkIsExistCategory = await Category.findById(payload.category);
 
   if (!checkIsExistCategory) {
@@ -56,11 +56,11 @@ const insertIntoDB = async (
   });
 
   const dbReceiver = await User.findById(user.userId)
-  if(dbReceiver?.deviceToken){
+  if (dbReceiver?.deviceToken) {
     const payload = {
-      title:  notificationMessage,
+      title: notificationMessage,
       body: 'View for more details.'
-    }; 
+    };
 
     sendPushNotification({ fcmToken: dbReceiver?.deviceToken, payload });
   }
@@ -85,7 +85,7 @@ const products = async (query: Record<string, unknown>) => {
     .filter()
     .sort()
     .paginate()
-    .fields(); 
+    .fields();
 
   const result = await categoryQuery.modelQuery;
   const meta = await categoryQuery.countTotal();
@@ -125,7 +125,7 @@ const updateProduct = async (req: Request) => {
 
   console.log("Updated product:", files.product_img);
 
-  if (files && files.product_img && files.product_img.length) {
+  if (files && files?.product_img && files?.product_img.length) {
     for (const image of files.product_img) {
       productImage.push(`/images/products/${image.filename}`);
     }
@@ -138,7 +138,7 @@ const updateProduct = async (req: Request) => {
 
   const updateData = {
     ...req.body,
-    images: productImage.length ? productImage : isExist.images,
+    images: productImage?.length ? productImage : isExist?.images,
   };
 
   try {
@@ -196,7 +196,7 @@ const singleProduct = async (req: Request) => {
   });
   const point = await makeProductPoints(result, user.userType)
 
-  const rattingDB : any = await Ratting.aggregate([
+  const rattingDB: any = await Ratting.aggregate([
     { $match: { swapOwner: new Types.ObjectId(result?.user._id) } },
     {
       $group: {
@@ -206,11 +206,11 @@ const singleProduct = async (req: Request) => {
     },
   ]);
 
-  let average_rating = 0; 
+  let average_rating = 0;
   if (rattingDB?.length > 0) {
-    average_rating = Number(rattingDB[0].averageRating.toFixed(2)); 
-  }  
-  return { product: result, similarProduct, point, ratting:average_rating};
+    average_rating = Number(rattingDB[0].averageRating.toFixed(2));
+  }
+  return { product: result, similarProduct, point, ratting: average_rating };
 };
 
 const productForSwap = async (req: Request) => {

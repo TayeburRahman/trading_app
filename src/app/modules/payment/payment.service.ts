@@ -32,7 +32,7 @@ const paymentSuccessAndSave = async (payload: {
   package_id: string;
 }) => {
 
-  console.log("Payment success", payload.amount, payload.user, payload.transaction_id, payload.plan_id)
+  // console.log("Payment success", payload.amount, payload.user, payload.transaction_id, payload.plan_id)
 
   const requiredFields = ["amount", "user", "transaction_id", "plan_id", "package_id"] as const;
 
@@ -68,7 +68,7 @@ const paymentSuccessAndSave = async (payload: {
     throw new ApiError(404, "Plan not found.");
   }
 
-  console.log(update);
+  // console.log(update);
 
   return { payment: result, plan: update };
 };
@@ -81,7 +81,7 @@ const getGoldIncome = async () => {
     }
 
     const goldPlanId = goldPlan._id;  
-    console.log('Gold Plan ID:', goldPlanId);
+    // console.log('Gold Plan ID:', goldPlanId);
 
     // Fetch total income for Gold plan
     const totalIncomeForGold = await Payment.aggregate([
@@ -108,7 +108,6 @@ const getGoldIncome = async () => {
   }
 };
 
-
 const getPlatinumIncome = async () => {
   try {
     // Fetch the Platinum plan
@@ -119,7 +118,7 @@ const getPlatinumIncome = async () => {
       return { message: 'Platinum plan not found.' };
     }
 
-    console.log('Platinum Plan ID:', platinumPlanId);
+    // console.log('Platinum Plan ID:', platinumPlanId);
 
     // Fetch total income for Platinum plan
     const totalIncomeForPlatinum = await Payment.aggregate([
@@ -136,7 +135,7 @@ const getPlatinumIncome = async () => {
       },
     ]);
 
-    console.log('Total Income for Platinum:', totalIncomeForPlatinum);
+    // console.log('Total Income for Platinum:', totalIncomeForPlatinum);
 
     return {
       planType: 'Platinum',
@@ -148,7 +147,6 @@ const getPlatinumIncome = async () => {
   }
 };
 
-
 const getDiamondIncome = async () => {
   try { 
     const diamondPlan = await Subscription.findOne({ planName: 'Diamond' });
@@ -158,7 +156,7 @@ const getDiamondIncome = async () => {
       return { message: 'Diamond plan not found.' };
     }
 
-    console.log('Diamond Plan ID:', diamondPlanId);
+    // console.log('Diamond Plan ID:', diamondPlanId);
  
     const totalIncomeForDiamond = await Payment.aggregate([
       {
@@ -174,7 +172,7 @@ const getDiamondIncome = async () => {
       },
     ]);
 
-    console.log('Total Income for Diamond:', totalIncomeForDiamond);
+    // console.log('Total Income for Diamond:', totalIncomeForDiamond);
 
     return {
       planType: 'Diamond',
@@ -186,13 +184,12 @@ const getDiamondIncome = async () => {
   }
 };
 
-
 const getAllPlanIncome = async () => {
   const goldIncome = await getGoldIncome();
   const platinumIncome = await getPlatinumIncome();
   const diamondIncome = await getDiamondIncome();
 
-  console.log('Gold income:', goldIncome, platinumIncome, diamondIncome);
+  // console.log('Gold income:', goldIncome, platinumIncome, diamondIncome);
 
   return {
     totalIncome: goldIncome.totalIncome + platinumIncome.totalIncome + diamondIncome.totalIncome,
@@ -213,6 +210,5 @@ const getTransitionsHistory = async () => {
 
    return payments;
 }
-
 
 export const PaymentService = { makePaymentIntent, paymentSuccessAndSave, getAllPlanIncome, getTransitionsHistory};

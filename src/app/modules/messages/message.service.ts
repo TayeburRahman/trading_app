@@ -125,9 +125,7 @@ const sendMessageOne = async (req: any)=> {
   try {
     const { userId: senderId } = req.user;
     const files = req.files;
-    const { receiverId, message } = req.body as any;
-
-    console.log("========", receiverId, message)
+    const { receiverId, message } = req.body as any; 
 
     if (!receiverId || !senderId) {
       throw new ApiError(404, 'Sender or Receiver user not found');
@@ -176,9 +174,7 @@ const sendMessageOne = async (req: any)=> {
     if (socketIo) {
       socketIo.to(receiverId.toString()).emit('new-message', newMessage);
       socketIo.to(senderId.toString()).emit('new-message', newMessage);
-    }
-
-    console.log('======', newMessage)
+    } 
 
      return { message: 'Message sent successfully' };
 
@@ -186,7 +182,6 @@ const sendMessageOne = async (req: any)=> {
     console.error('Error sending message:', error?.message || error);
   }
 };
-
 
 const getMessages = async (req: Request, res: Response) => {
   try {
