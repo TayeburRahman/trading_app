@@ -12,7 +12,19 @@ import { Subscription } from '../subscriptions/subscriptions.model';
 
 const insertIntoDB = async (req: Request): Promise<any> => {
   const { userId } = req.user as IReqUser;
-  const { swapId, ratting, comment } = req.body;
+  const { swapId, ratting, comment, swapOwner } = req.body;
+
+  const requiredFields = { swapId, swapOwner, ratting, comment };
+  const missingFields = Object.entries(requiredFields)
+    .filter(([key, value]) => !value)
+    .map(([key]) => key);
+
+  if (missingFields.length > 0) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      `The following fields are required: ${missingFields.join(', ')}`
+    );
+  }
 
   const isExistUser = await User.findById(userId);
   if (!isExistUser) {
@@ -55,10 +67,10 @@ const insertIntoDB = async (req: Request): Promise<any> => {
   if (!updatePoint) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
-
+  //note there issues
   return await Ratting.create({
     user: userId,
-    swapOwner: isExistSwap.userTo,
+    swapOwner: swapOwner,
     swap: swapId,
     ratting,
     comment,
