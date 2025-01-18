@@ -18,18 +18,18 @@ const subscriptions = async (req: any) => {
     if (!user) {
       throw new ApiError(404, 'User not found!');
     }
- 
+
     const subscriptions = await Plan.find({ user_id: query?.userId, active: true }) as any;
-    userPlan = subscriptions.map((sub: any) => sub.plan_id);  
+    userPlan = subscriptions.map((sub: any) => sub.plan_id);
   }
- 
+
   const result = await Subscription.find().sort({ pointRangeStart: 1 });
- 
+
   const subscriptionsWithPlanStatus = result.map((subscription: any) => {
     const hasUserPlan = userPlan && userPlan.some((planId: any) => planId.toString() === subscription.plan_id.toString());
     return {
       ...subscription.toObject(),
-      hasUserPlan, 
+      hasUserPlan,
     };
   });
 

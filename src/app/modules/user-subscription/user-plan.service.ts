@@ -285,9 +285,12 @@ const myMembership = async (req: Request) => {
   const plan = await Plan.findOne({ user_id: userId })
     .populate("plan_id")
     .select("amount planStartDate planEndDate plan_type status name email")
+
+  const planePoint = await Subscription.find().sort({ pointRangeStart: 1 }).select("pointRangeEnd pointRangeStart planName _id");
+
   const point = await Point.findOne({ user: userId }) as IPoints
 
-  return { profile, plan, point: point ? point?.points : 0 }
+  return { profile, plan, point: point ? point?.points : 0, planePoint }
 }
 
 const getPointList = async (req: Request) => {
