@@ -12,14 +12,15 @@ const insertIntoDB = async (payload: ISubscriptions) => {
 const subscriptions = async (req: any) => {
   const query = req.query;
   let userPlan = null;
+  const userReq = req?.user;
 
-  if (query?.userId) {
-    const user = await User.findById(query?.userId);
+  if (userReq) {
+    const user = await User.findById(userReq?.userId);
     if (!user) {
       throw new ApiError(404, 'User not found!');
     }
 
-    const subscriptionsDb = await Plan.find({ user_id: query?.userId, active: true }) as any;
+    const subscriptionsDb = await Plan.find({ user_id: userReq?.userId, active: true }) as any;
     console.log("subscriptions", subscriptionsDb)
     userPlan = subscriptionsDb.map((sub: any) => sub.plan_id);
   }
