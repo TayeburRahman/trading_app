@@ -4,6 +4,7 @@ export type IAdds = {
   isPrivate: boolean;
   isActive: boolean;
   url: string;
+  type: string;
 };
 export type IAddsVideo = {
   order: string;
