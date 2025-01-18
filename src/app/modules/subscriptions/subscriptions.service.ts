@@ -16,6 +16,7 @@ const subscriptions = async (req: any) => {
 
   if (userReq) {
     const user = await User.findById(userReq?.userId);
+
     if (!user) {
       throw new ApiError(404, 'User not found!');
     }
