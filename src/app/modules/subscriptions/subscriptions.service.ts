@@ -10,7 +10,7 @@ const insertIntoDB = async (payload: ISubscriptions) => {
 };
 
 const subscriptions = async (req: any) => {
-  const query = req.query;
+  const query = req.body;
   let userPlan = null;
 
   console.log("===================", query);
