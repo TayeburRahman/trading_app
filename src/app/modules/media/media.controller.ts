@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import catchAsync from '../../../shared/catchasync';
 import sendResponse from '../../../shared/sendResponse';
 import { AddsService } from './media.service';
-import { IAdds, IAddsVideo } from './media.interface';
+import { IAdds, IAddsVideo, IFilesVideo } from './media.interface';
 
 const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
   const result = await AddsService.insertIntoDB(req.files, req.body);
@@ -84,6 +84,54 @@ const allVideoAdds = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const addSmallBanner = catchAsync(async (req: Request, res: Response) => {
+  const result = await AddsService.addSmallBanner(req as Request);
+  sendResponse<IFilesVideo>(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Adds create successfully',
+    data: result,
+  });
+});
+
+const getSmallBanner = catchAsync(async (req: Request, res: Response) => {
+  const result = await AddsService.getSmallBanner(req.query);
+  sendResponse<IFilesVideo[]>(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Adds Retrieved successfully',
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
+const deleteSmallBanner = catchAsync(async (req: Request, res: Response) => {
+  const result = await AddsService.deleteSmallBanner(req.params.id);
+  sendResponse<IFilesVideo>(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Adds delete successfully',
+    data: result,
+  });
+});
+
+
+const updateSmallBanner = catchAsync(async (req: Request, res: Response) => {
+  const result = await AddsService.updateSmallBanner(req);
+  sendResponse<IFilesVideo>(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Adds update successfully',
+    data: result,
+  });
+});
+
+
+
+
+
+
 export const AddsController = {
   insertIntoDB,
   allAdds,
@@ -93,4 +141,8 @@ export const AddsController = {
   allVideoAdds,
   updateVideoAdds,
   deleteVideoAdds,
+  addSmallBanner,
+  getSmallBanner,
+  deleteSmallBanner,
+  updateSmallBanner
 };
