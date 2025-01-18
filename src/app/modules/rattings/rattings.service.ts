@@ -9,12 +9,13 @@ import { Swap } from '../swap/swap.model';
 import { makePoints } from '../points/points.services';
 import { Point } from '../points/points.model';
 import { Subscription } from '../subscriptions/subscriptions.model';
+import { ISwap } from '../swap/swap.interface';
 
 const insertIntoDB = async (req: Request): Promise<any> => {
   const { userId } = req.user as IReqUser;
-  const { swapId, ratting, comment, swapOwner } = req.body;
+  const { swapId, ratting, comment } = req.body;
 
-  const requiredFields = { swapId, swapOwner, ratting, comment };
+  const requiredFields = { swapId, ratting, comment };
   const missingFields = Object.entries(requiredFields)
     .filter(([key, value]) => !value)
     .map(([key]) => key);
@@ -26,10 +27,20 @@ const insertIntoDB = async (req: Request): Promise<any> => {
     );
   }
 
+  const isSwap = await Swap.findById(swapId) as ISwap;
+
+  if (!isSwap) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Swap not found'); ``
+  }
+
   const isExistUser = await User.findById(userId);
   if (!isExistUser) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
+
+  const swapOwner = isSwap.userTo.toString() === userId.toString()
+    ? isSwap.userFrom
+    : isSwap.userTo;
 
   const planName = isExistUser.userType === 'Trial' ? 'Gold' : isExistUser.userType;
   const isPackagtes = await Subscription.findOne({ planName });
