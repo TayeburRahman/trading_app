@@ -23,6 +23,9 @@ const subscriptions = async (req: any) => {
     userPlan = subscriptions.map((sub: any) => sub.plan_id);
   }
 
+  console.log("subscriptions", subscriptions)
+  console.log("userPlan", userPlan)
+
   const result = await Subscription.find().sort({ pointRangeStart: 1 });
 
   const subscriptionsWithPlanStatus = result.map((subscription: any) => {
