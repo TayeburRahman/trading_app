@@ -8,7 +8,7 @@ import { Plan } from './user-plan.model';
 import QueryBuilder from '../../../builder/QueryBuilder';
 import { IReqUser } from '../auth/auth.interface';
 import Notification from '../notifications/notifications.model';
-import { IUpgradePlan } from './user-plan.interface';
+// import { IUpgradePlan } from './user-plan.interface';
 import cron from 'node-cron';
 import { logger } from '../../../shared/logger';
 import { Point } from '../points/points.model';

@@ -13,3 +13,13 @@ export type IAddsVideo = {
   isActive: boolean;
   url: string;
 };
+
+
+export type IFilesVideo = {
+  order: string;
+  files: string;
+  isPrivate: boolean;
+  isActive: boolean;
+  url: string;
+};
+

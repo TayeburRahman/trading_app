@@ -25,9 +25,12 @@ export const uploadFile = () => {
         uploadPath = 'uploads/audio';
       } else if (file.fieldname === 'document') {
         uploadPath = 'uploads/documents';
+      } else if (file.fieldname === 'files') {
+        uploadPath = 'uploads/images/banner';
       } else {
         uploadPath = 'uploads/others';
       }
+
 
       // Ensure the directory exists
       if (!fs.existsSync(uploadPath)) {
@@ -71,6 +74,7 @@ export const uploadFile = () => {
       'message_img',
       'audio',
       'document',
+      'files'
     ];
 
     if (file.fieldname === undefined) {
@@ -100,6 +104,8 @@ export const uploadFile = () => {
     { name: 'video_thumbnail', maxCount: 1 },
     { name: 'thumbnail', maxCount: 1 },
     { name: 'message_img', maxCount: 10 },
+    { name: 'files', maxCount: 10 },
+
   ]);
 
   return upload;
