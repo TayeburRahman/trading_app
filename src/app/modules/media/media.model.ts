@@ -15,6 +15,10 @@ const addsSchema = new Schema<IAdds>(
       type: String,
       required: true,
     },
+    type: {
+      type: String,
+      enum: ['mainBanner', 'smallBanner'],
+    },
     isPrivate: {
       type: Boolean,
       default: false,

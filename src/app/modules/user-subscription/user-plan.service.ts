@@ -22,13 +22,13 @@ cron.schedule('* * * * *', async () => {
   try {
     const now = new Date();
     const result = await Plan.updateMany(
-      { 
+      {
         planEndDate: { $lte: now },
       },
       {
         $unset: { payment_status: 'unpaid', active: false },
       },
-    ); 
+    );
 
     if (result.modifiedCount > 0) {
       logger.info(
@@ -43,48 +43,48 @@ cron.schedule('* * * * *', async () => {
 const createSubscription = async (req: Request) => {
   const data = req.body;
   const { userId } = req.user as IReqUser;
- 
+
   if (!data.plan_id || !data.plan_type) {
     throw new ApiError(400, 'Plan ID and Plan Type are required');
   }
- 
+
   const checkUser = await User.findById(userId);
   if (!checkUser) {
     throw new ApiError(404, 'User not found');
   }
- 
+
   const subscriptionPlan = await Subscription.findById(data.plan_id) as ISubscriptions;
   if (!subscriptionPlan) {
     throw new ApiError(404, 'Plan not found');
   }
- 
+
   const startDate = new Date();
   const endDate = new Date(startDate);
-  endDate.setMonth(endDate.getMonth() + 1);  
+  endDate.setMonth(endDate.getMonth() + 1);
 
   data.planStartDate = startDate;
   data.planEndDate = endDate;
   data.user_id = userId;
 
-  try { 
+  try {
     const userPlan = await Plan.findOne({ user_id: userId });
-    if (userPlan?.payment_status === 'trial') {
+    if (userPlan?.payment_status === 'trial' && data.plan_type === "Trial") {
       throw new ApiError(400, 'User already has a trial plan');
     }
- 
+
     const existingPlan = await Plan.findOne({ user_id: userId, payment_status: { $in: ['unpaid', 'trial'] } });
     if (existingPlan) {
       await Plan.deleteMany({ user_id: userId, payment_status: { $in: ['unpaid', 'trial'] } });
     }
- 
+
     data.payment_status = data.plan_type === 'Trial' ? 'trial' : 'unpaid';
- 
+
     const subscription = await Plan.create([data]) as any;
- 
+
     checkUser.userType = data.plan_type;
     checkUser.planExpatDate = endDate;
     await checkUser.save();
- 
+
     const notifications = [
       {
         user: checkUser._id,
@@ -98,7 +98,7 @@ const createSubscription = async (req: Request) => {
         message: `A new user has applied for ${subscriptionPlan.planName} membership packages and waiting for approval, review the application for approval.`,
       },
     ];
- 
+
     await Notification.create(notifications);
     //@ts-ignore
     global.io.to(checkUser._id.toString()).emit('notification', notifications);
@@ -107,11 +107,11 @@ const createSubscription = async (req: Request) => {
       message: 'Subscription created successfully',
       subscription,
     };
-  } catch (error : any) {
-    console.error('Transaction error:', error.message);  
+  } catch (error: any) {
+    console.error('Transaction error:', error.message);
     throw new ApiError(500, 'Failed to create subscription');
   }
-}; 
+};
 
 const updateSubscription = async (req: Request) => {
   const { id } = req.params;
@@ -224,10 +224,10 @@ const statusUpdateRequest = async (req: Request) => {
   if (!updatedPlan) {
     throw new ApiError(404, 'Plan not found during update');
   }
- 
+
 
   return updatedPlan;
-};  
+};
 const sendNotification = async (
   userId: string,
   title: string,
@@ -242,11 +242,11 @@ const sendNotification = async (
   });
 
   const dbReceiver = await User.findById(userId)
-  if(dbReceiver?.deviceToken){
+  if (dbReceiver?.deviceToken) {
     const payload = {
-      title:  title,
+      title: title,
       body: message
-    };  
+    };
     sendPushNotification({ fcmToken: dbReceiver?.deviceToken, payload });
   }
 
@@ -278,38 +278,38 @@ const mySubscription = async (req: Request) => {
 
 const myMembership = async (req: Request) => {
   const { userId } = req.params;
-  const profile = await User.findById(userId);  
+  const profile = await User.findById(userId);
   if (!profile) {
     throw new ApiError(404, 'User not found');
   }
   const plan = await Plan.findOne({ user_id: userId })
-  .populate("plan_id")
-   .select("amount planStartDate planEndDate plan_type status name email" )  
-   const point = await Point.findOne({user: userId}) as IPoints
+    .populate("plan_id")
+    .select("amount planStartDate planEndDate plan_type status name email")
+  const point = await Point.findOne({ user: userId }) as IPoints
 
-  return { profile, plan, point : point? point?.points: 0 }
+  return { profile, plan, point: point ? point?.points : 0 }
 }
 
-const getPointList = async (req: Request) =>{
-  const {userId} = req.params;
+const getPointList = async (req: Request) => {
+  const { userId } = req.params;
   if (!userId) {
     throw new ApiError(401, 'User not authenticated');
   }
-  const points = await Point.findOne({user: userId});
- return points
+  const points = await Point.findOne({ user: userId });
+  return points
 }
 
-const getPlanSwapHistory = async (req: Request) =>{
-  const {userId} = req.params;
+const getPlanSwapHistory = async (req: Request) => {
+  const { userId } = req.params;
   if (!userId) {
     throw new ApiError(401, 'User not authenticated');
-  } 
-  const points = await Point.findOne({user: userId});
+  }
+  const points = await Point.findOne({ user: userId });
 
   const swapHistory = await Swap.find({
-    
+
   })
- return points
+  return points
 }
 
 export const UpgradePlanService = {
