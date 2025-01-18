@@ -78,7 +78,7 @@ const insertIntoDB = async (req: Request): Promise<any> => {
   if (!updatePoint) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
-  //note there issues
+
   return await Ratting.create({
     user: userId,
     swapOwner: swapOwner,
