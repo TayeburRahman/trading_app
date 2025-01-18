@@ -19,11 +19,12 @@ const subscriptions = async (req: any) => {
       throw new ApiError(404, 'User not found!');
     }
 
-    const subscriptions = await Plan.find({ user_id: query?.userId, active: true }) as any;
-    userPlan = subscriptions.map((sub: any) => sub.plan_id);
+    const subscriptionsDb = await Plan.find({ user_id: query?.userId, active: true }) as any;
+    console.log("subscriptions", subscriptionsDb)
+    userPlan = subscriptionsDb.map((sub: any) => sub.plan_id);
   }
 
-  console.log("subscriptions", subscriptions)
+
   console.log("userPlan", userPlan)
 
   const result = await Subscription.find().sort({ pointRangeStart: 1 });
