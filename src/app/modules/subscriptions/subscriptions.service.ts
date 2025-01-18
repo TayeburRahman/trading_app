@@ -13,6 +13,8 @@ const subscriptions = async (req: any) => {
   const query = req.query;
   let userPlan = null;
 
+  console.log("===================", query);
+
   if (query?.userId) {
     const user = await User.findById(query?.userId);
     if (!user) {
