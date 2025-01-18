@@ -11,11 +11,10 @@ export const app: Application = express();
 app.use(
   cors({
     origin: [
-      "http://localhost:3001",
+      "https://swiftswapp.com",
       "http://192.168.12.90:3003",
       "http://localhost:3000",
       "http://10.0.60.43:3002",
-      "https://swiftswapp.com",
       "https://www.swiftswapp.com",
       "https://dashboard.swiftswapp.com",
       "https://www.dashboard.swiftswapp.com",
