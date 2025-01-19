@@ -40,6 +40,18 @@ async function sendPushNotification({
     },
     data: payload.data || {},
     token: fcmToken,
+    android: {
+      notification: {
+        sound: 'default', // Set default sound for Android
+      },
+    },
+    apns: {
+      payload: {
+        aps: {
+          sound: 'default', // Set default sound for iOS
+        },
+      },
+    },
   };
 
   try {
@@ -51,3 +63,6 @@ async function sendPushNotification({
 }
 
 export { sendPushNotification };
+
+
+
