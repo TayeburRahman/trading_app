@@ -42,13 +42,18 @@ async function sendPushNotification({
     token: fcmToken,
     android: {
       notification: {
-        sound: 'default', // Set default sound for Android
+        sound: 'default', // Android-specific sound configuration
+        priority: 'high', // Ensures high priority for sound and alert
       },
     },
     apns: {
       payload: {
         aps: {
-          sound: 'default', // Set default sound for iOS
+          alert: {
+            title: payload.title,
+            body: payload.body,
+          },
+          sound: 'default', // iOS-specific sound configuration
         },
       },
     },
