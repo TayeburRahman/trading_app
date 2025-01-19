@@ -14,40 +14,36 @@ import { Ratting } from '../rattings/rattings.model';
 import { Types } from 'mongoose';
 import { sendPushNotification } from '../push-notification/push.notifications';
 
-const insertIntoDB = async (
-  files: any,
-  payload: IProducts,
-  user: JwtPayload,
-) => {
+const insertIntoDB = async (files: any, payload: IProducts, user: JwtPayload) => {
   if (!files?.product_img) {
     throw new ApiError(400, 'File is missing');
   }
-  const checkIsExistCategory = await Category.findById(payload.category);
 
-  if (!checkIsExistCategory) {
+  const [category, subCategory, existUser] = await Promise.all([
+    Category.findById(payload.category),
+    SubCategory.findById(payload.subCategory),
+    User.findById(user.userId),
+  ]);
+
+  if (!category) {
     throw new ApiError(400, 'Category not found');
   }
-  const checkIsExistSubCategory = await SubCategory.findById(
-    payload.subCategory,
-  );
-  if (!checkIsExistSubCategory) {
+  if (!subCategory) {
     throw new ApiError(400, 'Sub Category not found');
   }
-  const existUser = await User.findById(user.userId);
   if (!existUser) {
     throw new ApiError(400, 'User not found');
   }
+
   if (files?.product_img) {
-    const images = files.product_img.map(
-      (file: any) => `/images/products/${file.filename}`,
-    );
-    payload.images = images;
+    payload.images = files.product_img.map((file: any) => `/images/products/${file.filename}`);
   }
+
   payload.user = user.userId;
 
   const result = await Product.create(payload);
 
-  const notificationMessage = `You successfully post your add!`;
+  const notificationMessage = 'You successfully post your add!';
   const notification = await Notification.create({
     title: notificationMessage,
     user: user.userId,
@@ -55,27 +51,25 @@ const insertIntoDB = async (
     message: 'View for more details.',
   });
 
-  const dbReceiver = await User.findById(user.userId)
+  const dbReceiver = await User.findById(user.userId);
   if (dbReceiver?.deviceToken) {
-    const payload = {
+    const pushPayload = {
       title: notificationMessage,
-      body: 'View for more details.'
+      body: 'View for more details.',
     };
-
-    sendPushNotification({ fcmToken: dbReceiver?.deviceToken, payload });
+    sendPushNotification({ fcmToken: dbReceiver.deviceToken, payload: pushPayload });
   }
 
+  // Emit socket notification
   //@ts-ignore
   const socketIo = global.io;
   if (socketIo) {
-    socketIo.emit(
-      `notification::${notification?._id.toString()}`,
-      notification,
-    );
+    socketIo.emit(`notification::${notification?._id.toString()}`, notification);
   }
 
   return result;
 };
+
 
 const products = async (query: Record<string, unknown>) => {
   const userId = query.userId;
