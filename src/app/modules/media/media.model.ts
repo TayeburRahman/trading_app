@@ -42,10 +42,10 @@ const videoAddsSchema = new Schema<IAddsVideo>(
       type: String,
       required: true,
     },
-    video: {
-      type: String,
-      required: true,
-    },
+    // video: {
+    //   type: String,
+    //   required: true,
+    // },
     isPrivate: {
       type: Boolean,
       default: false,
@@ -78,6 +78,11 @@ const videoBannerSchema = new Schema<IFilesVideo>(
       type: Boolean,
       default: false,
     },
+    type: {
+      type: String,
+      enum: ['video', 'image'],
+      required: true,
+    },
     isActive: {
       type: Boolean,
       default: false,
@@ -90,4 +95,3 @@ const videoBannerSchema = new Schema<IFilesVideo>(
 export const Adds = model('Adds', addsSchema);
 export const VideoAdds = model('VideoAdds', videoAddsSchema);
 export const SmallBanner = model('smallBanner', videoBannerSchema);
-

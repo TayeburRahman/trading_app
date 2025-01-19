@@ -18,13 +18,13 @@ const insertIntoDB = async (files: any, payload: IAdds) => {
   return await Adds.create(payload);
 };
 const addVideoAdds = async (files: any, payload: IAddsVideo) => {
-  if (!files?.video) {
-    throw new ApiError(400, 'File is missing');
-  }
+  // if (!files?.video) {
+  //   throw new ApiError(400, 'File is missing');
+  // }
 
-  if (files?.video) {
-    payload.video = `/video/${files.video[0].filename}`;
-  }
+  // if (files?.video) {
+  //   payload.video = `/video/${files.video[0].filename}`;
+  // }
   return await VideoAdds.create(payload);
 };
 const allAdds = async (query: Record<string, unknown>) => {
@@ -85,7 +85,7 @@ const updateAdds = async (req: Request) => {
   return result;
 };
 const updateVideoAdds = async (req: Request) => {
-  const { files } = req as any;
+  // const { files } = req as any;
   const id = req.params.id;
   const { ...AddsData } = req.body;
 
@@ -99,11 +99,11 @@ const updateVideoAdds = async (req: Request) => {
   }
 
   try {
-    console.log("Update VideoAdds Request:", AddsData);
+    console.log('Update VideoAdds Request:', AddsData);
 
-    if (files && files.video && files.video[0]) {
-      AddsData.video = `/video/${files.video[0].filename}`;
-    }
+    // if (files && files.video && files.video[0]) {
+    //   AddsData.video = `/video/${files.video[0].filename}`;
+    // }
 
     const isExist = await VideoAdds.findById(id);
     if (!isExist) {
@@ -114,7 +114,7 @@ const updateVideoAdds = async (req: Request) => {
     const result = await VideoAdds.findOneAndUpdate(
       { _id: id },
       { ...updatedData },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!result) {
@@ -124,7 +124,10 @@ const updateVideoAdds = async (req: Request) => {
     return result;
   } catch (error: any) {
     console.error('Error updating VideoAdds:', error);
-    throw new ApiError(500, `An error occurred while updating VideoAdds: ${error.message}`);
+    throw new ApiError(
+      500,
+      `An error occurred while updating VideoAdds: ${error.message}`,
+    );
   }
 };
 const deleteAdds = async (id: string) => {
@@ -144,7 +147,7 @@ const deleteVideoAdds = async (id: string) => {
   return await VideoAdds.findByIdAndDelete(id);
 };
 const addSmallBanner = async (req: any) => {
-  const files = req.files
+  const files = req.files;
   const payload = req.body;
 
   if (!files?.files) {
@@ -163,8 +166,6 @@ const updateSmallBanner = async (req: Request) => {
   const id = req.params.id;
   const { ...AddsData } = req.body;
 
-
-
   // Validate the ID
   if (!id) {
     throw new ApiError(400, 'Missing VideoAdds ID.');
@@ -175,7 +176,6 @@ const updateSmallBanner = async (req: Request) => {
   }
 
   try {
-
     if (files && files.files && files.files[0]) {
       AddsData.files = `/images/banner/${files.files[0].filename}`;
     }
@@ -186,11 +186,11 @@ const updateSmallBanner = async (req: Request) => {
     }
 
     const updatedData: Partial<IFilesVideo> = { ...AddsData };
-    console.log("updates:", updatedData)
+    console.log('updates:', updatedData);
     const result = await SmallBanner.findOneAndUpdate(
       { _id: id },
       { ...updatedData },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!result) {
@@ -200,7 +200,10 @@ const updateSmallBanner = async (req: Request) => {
     return result;
   } catch (error: any) {
     console.error('Error updating VideoAdds:', error);
-    throw new ApiError(500, `An error occurred while updating VideoAdds: ${error.message}`);
+    throw new ApiError(
+      500,
+      `An error occurred while updating VideoAdds: ${error.message}`,
+    );
   }
 };
 
@@ -241,5 +244,5 @@ export const AddsService = {
   addSmallBanner,
   getSmallBanner,
   deleteSmallBanner,
-  updateSmallBanner
+  updateSmallBanner,
 };

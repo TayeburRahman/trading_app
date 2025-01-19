@@ -35,6 +35,7 @@ const updateAdds = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateVideoAdds = catchAsync(async (req: Request, res: Response) => {
+  console.log('req', req);
   const result = await AddsService.updateVideoAdds(req);
   sendResponse<IAddsVideo>(res, {
     statusCode: 200,
@@ -84,7 +85,6 @@ const allVideoAdds = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-
 const addSmallBanner = catchAsync(async (req: Request, res: Response) => {
   const result = await AddsService.addSmallBanner(req as Request);
   sendResponse<IFilesVideo>(res, {
@@ -116,7 +116,6 @@ const deleteSmallBanner = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-
 const updateSmallBanner = catchAsync(async (req: Request, res: Response) => {
   const result = await AddsService.updateSmallBanner(req);
   sendResponse<IFilesVideo>(res, {
@@ -126,11 +125,6 @@ const updateSmallBanner = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-
-
-
-
-
 
 export const AddsController = {
   insertIntoDB,
@@ -144,5 +138,5 @@ export const AddsController = {
   addSmallBanner,
   getSmallBanner,
   deleteSmallBanner,
-  updateSmallBanner
+  updateSmallBanner,
 };

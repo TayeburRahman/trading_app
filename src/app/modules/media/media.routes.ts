@@ -52,14 +52,12 @@ router.delete(
   AddsController.deleteVideoAdds,
 );
 
-
 router.post(
   '/create-small-banner',
   uploadFile(),
   // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   AddsController.addSmallBanner,
 );
-
 
 router.get(
   '/get-small-banner',
