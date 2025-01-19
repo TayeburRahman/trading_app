@@ -34,8 +34,8 @@ const productSchema = new Schema({
     required: true,
   },
   status: {
-    type: String, 
-    default: 'pending', 
+    type: String,
+    default: 'pending',
     enum: ['completed', "pending"]
   },
   address: {

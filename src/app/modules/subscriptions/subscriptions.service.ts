@@ -9,11 +9,9 @@ const insertIntoDB = async (payload: ISubscriptions) => {
   return await Subscription.create(payload);
 };
 
-const subscriptions = async (req: any) => {
-  const query = req.body;
+const subscriptions = async (req: Request) => {
+  const query = req.query;
   let userPlan = null;
-
-  console.log("===================", query);
 
   if (query?.userId) {
     const user = await User.findById(query?.userId);
