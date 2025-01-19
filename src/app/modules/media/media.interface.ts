@@ -14,12 +14,11 @@ export type IAddsVideo = {
   url: string;
 };
 
-
 export type IFilesVideo = {
   order: string;
   files: string;
   isPrivate: boolean;
   isActive: boolean;
+  type: 'video' | 'image';
   url: string;
 };
-
