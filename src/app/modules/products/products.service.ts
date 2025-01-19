@@ -97,6 +97,7 @@ const products = async (query: Record<string, unknown>) => {
 };
 
 const myProducts = async (user: JwtPayload, query: Record<string, unknown>) => {
+  query.status = ['completed', "pending"]
   const categoryQuery = new QueryBuilder(
     Product.find({ user: user.userId })
       .populate('category')
