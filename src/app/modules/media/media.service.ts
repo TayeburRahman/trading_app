@@ -86,7 +86,6 @@ const updateAdds = async (req: Request) => {
 };
 const updateVideoAdds = async (req: Request) => {
   const { files } = req as any;
-  console.log('files', files);
   const id = req.params.id;
   const { ...AddsData } = req.body;
 
@@ -100,22 +99,19 @@ const updateVideoAdds = async (req: Request) => {
   }
 
   try {
-    // console.log('Update VideoAdds Request:', AddsData);
+    console.log('Update VideoAdds Request:', AddsData);
 
-    // if (files && files.video && files.video[0]) {
-    //   console.log('come form cideo');
-    //   AddsData.files = `/video/${files.video[0].filename}`;
-    // }
-    if (files && files.files && files.files[0]) {
-      AddsData.files = `/images/banner/${files.files[0].filename}`;
+    if (files && files.video && files.video[0]) {
+      AddsData.video = `/video/${files.video[0].filename}`;
     }
 
-    const isExist = await SmallBanner.findById(id);
+    const isExist = await VideoAdds.findById(id);
     if (!isExist) {
       throw new ApiError(404, 'VideoAdds not found.');
     }
+
     const updatedData: Partial<IAddsVideo> = { ...AddsData };
-    const result = await SmallBanner.findOneAndUpdate(
+    const result = await VideoAdds.findOneAndUpdate(
       { _id: id },
       { ...updatedData },
       { new: true, runValidators: true },
@@ -124,9 +120,10 @@ const updateVideoAdds = async (req: Request) => {
     if (!result) {
       throw new ApiError(500, 'Failed to update VideoAdds.');
     }
-    console.log('result', result);
+
     return result;
   } catch (error: any) {
+    console.error('Error updating VideoAdds:', error);
     throw new ApiError(
       500,
       `An error occurred while updating VideoAdds: ${error.message}`,
