@@ -320,21 +320,32 @@ const getUsersSwapProduct = async (req: Request) => {
         populate: populateFields
       });
 
+    // Add 'report' field to each swap
+    const modifiedSwaps = swaps.map(swap => {
+      const isReported = swap.reporting.includes(user.userId);
+      return {
+        ...swap.toObject(),
+        report: isReported
+      };
+    });
+
+    // If title filter is provided, apply it
     if (title) {
       const regex = new RegExp(title, 'i');
-      return swaps.filter(swap =>
+      return modifiedSwaps.filter(swap =>
         (swap.productFrom && regex.test(swap.productFrom.title)) ||
         (swap.productTo && regex.test(swap.productTo.title))
       );
     }
 
-    return swaps;
+    return modifiedSwaps;
 
   } catch (error) {
     console.error("Error fetching swaps:", error);
     throw new Error("Failed to fetch swaps");
   }
 };
+
 
 const getSwapProductPlanType = async (req: Request) => {
   const user = req.user as { userId: string };
@@ -472,6 +483,11 @@ const createReports = async (req: Request) => {
 
   const result = await Reports.create(payload);
 
+  const swaps = await Swap.findByIdAndUpdate(
+    payload.swapId,
+    { $push: { reporting: user.userId } },
+    { new: true },
+  );
   return result;
 };
 
