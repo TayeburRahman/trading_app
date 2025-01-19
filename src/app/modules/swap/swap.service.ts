@@ -177,11 +177,8 @@ const approveSwap = async (req: Request): Promise<any> => {
     throw new ApiError(httpStatus.NOT_FOUND, 'To user not found');
   }
 
-
-
   const points = await makeSwapPoints({ fromProduct, toProduct }, { user, toUser });
 
-  console.log("points", points)
   // Update swap and user points in parallel
   const [updatedSwap, fromPoint, toPoint] = await Promise.all([
     Swap.findByIdAndUpdate(
@@ -223,7 +220,7 @@ const approveSwap = async (req: Request): Promise<any> => {
     ),
   ]);
 
-  const [to_product, from_product] = await Promise.all([
+  const [to_swap, from_swap] = await Promise.all([
     Swap.findByIdAndUpdate(
       toProduct._id,
       {
@@ -235,6 +232,23 @@ const approveSwap = async (req: Request): Promise<any> => {
         status: "completed"
       })
   ])
+
+  console.log("======", fromProduct, toProduct)
+
+  const [to_product, from_product] = await Promise.all([
+    Product.findByIdAndUpdate(
+      toProduct._id,
+      {
+        status: "swapped"
+      }),
+    Product.findByIdAndUpdate(
+      fromProduct._id,
+      {
+        status: "swapped"
+      })
+  ])
+
+  console.log("===fromProduct", from_product, to_product)
 
   const notificationMessage = `Accept your swap request!`;
   const notification = await Notification.create({
