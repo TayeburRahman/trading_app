@@ -7,6 +7,8 @@ import { IRegistration, IReqUser } from '../auth/auth.interface';
 import User from '../auth/auth.model';
 import { Ratting } from '../rattings/rattings.model';
 import { Plan } from '../user-subscription/user-plan.model';
+import { IPoints } from '../points/points.interface';
+import { Point } from '../points/points.model';
 
 //!
 const registerAdmin = async (payload: IRegistration) => {
@@ -39,14 +41,14 @@ const getMyProfile = async (req: Request) => {
     throw new ApiError(401, 'User not authenticated');
   }
   const result = await User.findById(userId);
-  const plan = await Plan.findOne({user_id: userId, active: true})
-  
+  const plan = await Plan.findOne({ user_id: userId, active: true })
+
 
   if (!result) {
     throw new ApiError(404, 'Profile not found');
   }
 
-  const rattingDB : any = await Ratting.aggregate([
+  const rattingDB: any = await Ratting.aggregate([
     { $match: { swapOwner: new Types.ObjectId(userId) } },
     {
       $group: {
@@ -56,12 +58,15 @@ const getMyProfile = async (req: Request) => {
     },
   ]);
 
-  let average_rating = 0; 
+  let average_rating = 0;
   if (rattingDB?.length > 0) {
-    average_rating = Number(rattingDB[0].averageRating.toFixed(2)); 
-  }   
+    average_rating = Number(rattingDB[0].averageRating.toFixed(2));
+  }
 
-  return {result, planStartDate: plan?.planStartDate, planEndDate: plan?.planEndDate,  ratting:average_rating};
+  const point = await Point.findOne({ user: userId }) as IPoints
+
+
+  return { result, planStartDate: plan?.planStartDate, planEndDate: plan?.planEndDate, ratting: average_rating, point: point ? point?.points : 0 };
 };
 
 const getUserProfile = async (req: any) => {

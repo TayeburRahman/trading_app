@@ -180,6 +180,8 @@ const approveSwap = async (req: Request): Promise<any> => {
 
 
   const points = await makeSwapPoints({ fromProduct, toProduct }, { user, toUser });
+
+  console.log("points", points)
   // Update swap and user points in parallel
   const [updatedSwap, fromPoint, toPoint] = await Promise.all([
     Swap.findByIdAndUpdate(
