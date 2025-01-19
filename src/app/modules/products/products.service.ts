@@ -81,7 +81,7 @@ const products = async (query: Record<string, unknown>) => {
   const userId = query.userId;
 
   const categoryQuery = new QueryBuilder(Product.find(), query)
-    .search(['title'])
+    .search(['title', 'address'])
     .filter()
     .sort()
     .paginate()

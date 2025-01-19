@@ -32,7 +32,7 @@ const deleteSubscription = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const subscriptions = catchAsync(async (req: Request, res: Response) => {
-  const result = await SubscriptionService.subscriptions(res);
+  const result = await SubscriptionService.subscriptions(res as any);
   sendResponse(res, {
     statusCode: 200,
     success: true,
