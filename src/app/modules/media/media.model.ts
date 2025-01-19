@@ -5,7 +5,7 @@ const addsSchema = new Schema<IAdds>(
   {
     order: {
       type: String,
-      required: true,
+      // required: true,
     },
     url: {
       type: String,
@@ -36,7 +36,7 @@ const videoAddsSchema = new Schema<IAddsVideo>(
   {
     order: {
       type: String,
-      required: true,
+      // required: true,
     },
     url: {
       type: String,
@@ -64,7 +64,7 @@ const videoBannerSchema = new Schema<IFilesVideo>(
   {
     order: {
       type: String,
-      required: true,
+      // required: true,
     },
     url: {
       type: String,
