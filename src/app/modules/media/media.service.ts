@@ -18,13 +18,13 @@ const insertIntoDB = async (files: any, payload: IAdds) => {
   return await Adds.create(payload);
 };
 const addVideoAdds = async (files: any, payload: IAddsVideo) => {
-  if (!files?.video) {
-    throw new ApiError(400, 'File is missing');
-  }
+  // if (!files?.video) {
+  //   throw new ApiError(400, 'File is missing');
+  // }
 
-  if (files?.video) {
-    payload.video = `/video/${files.video[0].filename}`;
-  }
+  // if (files?.video) {
+  //   payload.video = `/video/${files.video[0].filename}`;
+  // }
   return await VideoAdds.create(payload);
 };
 const allAdds = async (query: Record<string, unknown>) => {
@@ -85,7 +85,7 @@ const updateAdds = async (req: Request) => {
   return result;
 };
 const updateVideoAdds = async (req: Request) => {
-  const { files } = req as any;
+  // const { files } = req as any;
   const id = req.params.id;
   const { ...AddsData } = req.body;
 
@@ -101,9 +101,9 @@ const updateVideoAdds = async (req: Request) => {
   try {
     console.log('Update VideoAdds Request:', AddsData);
 
-    if (files && files.video && files.video[0]) {
-      AddsData.video = `/video/${files.video[0].filename}`;
-    }
+    // if (files && files.video && files.video[0]) {
+    //   AddsData.video = `/video/${files.video[0].filename}`;
+    // }
 
     const isExist = await VideoAdds.findById(id);
     if (!isExist) {

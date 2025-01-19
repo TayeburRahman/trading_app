@@ -42,10 +42,10 @@ const videoAddsSchema = new Schema<IAddsVideo>(
       type: String,
       required: true,
     },
-    video: {
-      type: String,
-      required: true,
-    },
+    // video: {
+    //   type: String,
+    //   required: true,
+    // },
     isPrivate: {
       type: Boolean,
       default: false,
