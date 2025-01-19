@@ -81,7 +81,7 @@ const videoBannerSchema = new Schema<IFilesVideo>(
     type: {
       type: String,
       enum: ['video', 'image'],
-      required: true,
+      // required: true,
     },
     isActive: {
       type: Boolean,
