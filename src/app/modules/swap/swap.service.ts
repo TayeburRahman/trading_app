@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import { ISwap } from './swap.interface';
 import ApiError from '../../../errors/ApiError';
-import { Swap } from './swap.model';
+import { Reports, Swap } from './swap.model';
 import User from '../auth/auth.model';
 import { IReqUser, IUser } from '../auth/auth.interface';
 // import { Point } from '../points/points.model';
@@ -439,6 +439,26 @@ const partnerProfileDetails = async (req: Request) => {
 
 }
 
+const createReports = async (req: Request) => {
+  const user = req.user as IReqUser;
+  const payload = req.body;
+  const files = req.files as any;
+
+  if (!payload.againstUser || !payload.description || !payload.swapId) {
+    throw new ApiError(400, 'Invalid payload: againstUser, description, and swapId are required');
+  }
+
+  if (files?.reportImage) {
+    payload.reportImage = files.reportImage.map((file: any) => `/images/reports/${file.filename}`);
+  }
+
+  payload.userFrom = user.userId;
+
+  const result = await Reports.create(payload);
+
+  return result;
+};
+
 export const SwapService = {
   makeSwap,
   pendingSwap,
@@ -448,5 +468,6 @@ export const SwapService = {
   rejectSwap,
   getUsersSwapProduct,
   partnerProfileDetails,
-  getSwapProductPlanType
+  getSwapProductPlanType,
+  createReports
 };

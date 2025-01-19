@@ -29,7 +29,7 @@ const pendingSwap: RequestHandler = catchAsync(
 
 const cancelSwapRequest: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    console.log("cancelSwapRequest",  req.params.id);
+    console.log("cancelSwapRequest", req.params.id);
     const result = await SwapService.cancelSwapRequest(req);
     sendResponse(res, {
       statusCode: 200,
@@ -88,7 +88,7 @@ const getUsersSwapProduct: RequestHandler = catchAsync(
     });
   },
 );
- 
+
 const partnerProfileDetails: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const result = await SwapService.partnerProfileDetails(req);
@@ -112,7 +112,21 @@ const getSwapProductPlanType: RequestHandler = catchAsync(
     });
   },
 );
- 
+
+
+const createReports: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await SwapService.createReports(req as any);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Partner profile history successfully get!',
+      data: result,
+    });
+  },
+);
+
+
 
 export const SwapController = {
   makeSwap,
@@ -123,5 +137,6 @@ export const SwapController = {
   getUsersSwapProduct,
   cancelSwapRequest,
   partnerProfileDetails,
-  getSwapProductPlanType
+  getSwapProductPlanType,
+  createReports
 };
