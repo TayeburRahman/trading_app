@@ -8,7 +8,7 @@ export type IAdds = {
 };
 export type IAddsVideo = {
   order: string;
-  video: string;
+  // video: string;
   isPrivate: boolean;
   isActive: boolean;
   url: string;

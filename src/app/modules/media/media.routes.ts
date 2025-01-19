@@ -14,7 +14,7 @@ router.post(
 router.post(
   '/create-video-adds',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-  uploadFile(),
+  // uploadFile(),
   AddsController.addVideoAdds,
 );
 
@@ -38,7 +38,7 @@ router.patch(
 router.patch(
   '/edit-video-adds/:id',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-  uploadFile(),
+  // uploadFile(),
   AddsController.updateVideoAdds,
 );
 router.delete(
@@ -55,7 +55,7 @@ router.delete(
 router.post(
   '/create-small-banner',
   uploadFile(),
-  // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   AddsController.addSmallBanner,
 );
 
@@ -68,13 +68,13 @@ router.get(
 
 router.delete(
   '/delete-small-banner/:id',
-  // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   AddsController.deleteSmallBanner,
 );
 
 router.patch(
   '/edit-small-banner/:id',
-  // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   uploadFile(),
   AddsController.updateSmallBanner,
 );
