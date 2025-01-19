@@ -79,7 +79,7 @@ const insertIntoDB = async (
 
 const products = async (query: Record<string, unknown>) => {
   const userId = query.userId;
-
+  query.status = ['completed', "pending"]
   const categoryQuery = new QueryBuilder(Product.find(), query)
     .search(['title', 'address'])
     .filter()

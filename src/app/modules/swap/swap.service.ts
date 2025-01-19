@@ -177,11 +177,8 @@ const approveSwap = async (req: Request): Promise<any> => {
     throw new ApiError(httpStatus.NOT_FOUND, 'To user not found');
   }
 
-
-
   const points = await makeSwapPoints({ fromProduct, toProduct }, { user, toUser });
 
-  console.log("points", points)
   // Update swap and user points in parallel
   const [updatedSwap, fromPoint, toPoint] = await Promise.all([
     Swap.findByIdAndUpdate(
@@ -223,7 +220,7 @@ const approveSwap = async (req: Request): Promise<any> => {
     ),
   ]);
 
-  const [to_product, from_product] = await Promise.all([
+  const [to_swap, from_swap] = await Promise.all([
     Swap.findByIdAndUpdate(
       toProduct._id,
       {
@@ -235,6 +232,23 @@ const approveSwap = async (req: Request): Promise<any> => {
         status: "completed"
       })
   ])
+
+  console.log("======", fromProduct, toProduct)
+
+  const [to_product, from_product] = await Promise.all([
+    Product.findByIdAndUpdate(
+      toProduct._id,
+      {
+        status: "swapped"
+      }),
+    Product.findByIdAndUpdate(
+      fromProduct._id,
+      {
+        status: "swapped"
+      })
+  ])
+
+  console.log("===fromProduct", from_product, to_product)
 
   const notificationMessage = `Accept your swap request!`;
   const notification = await Notification.create({
@@ -306,21 +320,32 @@ const getUsersSwapProduct = async (req: Request) => {
         populate: populateFields
       });
 
+    // Add 'report' field to each swap
+    const modifiedSwaps = swaps.map(swap => {
+      const isReported = swap.reporting.includes(user.userId);
+      return {
+        ...swap.toObject(),
+        report: isReported
+      };
+    });
+
+    // If title filter is provided, apply it
     if (title) {
       const regex = new RegExp(title, 'i');
-      return swaps.filter(swap =>
+      return modifiedSwaps.filter(swap =>
         (swap.productFrom && regex.test(swap.productFrom.title)) ||
         (swap.productTo && regex.test(swap.productTo.title))
       );
     }
 
-    return swaps;
+    return modifiedSwaps;
 
   } catch (error) {
     console.error("Error fetching swaps:", error);
     throw new Error("Failed to fetch swaps");
   }
 };
+
 
 const getSwapProductPlanType = async (req: Request) => {
   const user = req.user as { userId: string };
@@ -458,6 +483,11 @@ const createReports = async (req: Request) => {
 
   const result = await Reports.create(payload);
 
+  const swaps = await Swap.findByIdAndUpdate(
+    payload.swapId,
+    { $push: { reporting: user.userId } },
+    { new: true },
+  );
   return result;
 };
 

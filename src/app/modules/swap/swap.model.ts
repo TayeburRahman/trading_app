@@ -38,6 +38,11 @@ const swapSchema = new Schema<ISwap>(
       type: String,
       default: "Gold"
     },
+    reporting: {
+      type: [Schema.Types.ObjectId],
+      ref: "User",
+      default: []
+    },
     ratting: [
       {
         type: Schema.Types.ObjectId,

@@ -12,6 +12,7 @@ export type ISwap = {
   swapUserFromPoint: Number;
   ratting: Array<IUser>;
   plan_type: string;
+  reporting: [Types.ObjectId];
 };
 
 
