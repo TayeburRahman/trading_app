@@ -48,5 +48,11 @@ router.patch(
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   DashboardController.getIncomeDebag,
 );
+// =====================================================
+// router.get(
+//   '/total-user_count',
+//   // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+//   DashboardController.totalCount,
+// );
 
 export const DashboardRoutes = router;

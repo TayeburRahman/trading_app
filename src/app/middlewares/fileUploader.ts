@@ -27,7 +27,11 @@ export const uploadFile = () => {
         uploadPath = 'uploads/documents';
       } else if (file.fieldname === 'files') {
         uploadPath = 'uploads/images/banner';
-      } else {
+      } else if (file.fieldname === 'reportImage') {
+        uploadPath = 'uploads/images/reports';
+      }
+
+      else {
         uploadPath = 'uploads/others';
       }
 
@@ -74,7 +78,8 @@ export const uploadFile = () => {
       'message_img',
       'audio',
       'document',
-      'files'
+      'files',
+      'reportImage'
     ];
 
     if (file.fieldname === undefined) {
@@ -105,6 +110,9 @@ export const uploadFile = () => {
     { name: 'thumbnail', maxCount: 1 },
     { name: 'message_img', maxCount: 10 },
     { name: 'files', maxCount: 10 },
+    { name: 'reportImage', maxCount: 10 },
+
+
 
   ]);
 

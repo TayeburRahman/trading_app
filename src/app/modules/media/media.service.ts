@@ -64,6 +64,8 @@ const updateAdds = async (req: Request) => {
   const id = req.params.id;
   const { ...AddsData } = req.body;
 
+  console.log("AddsData", AddsData)
+
   if (files && files.image) {
     AddsData.image = `/images/image/${files.image[0].filename}`;
   }
@@ -81,7 +83,7 @@ const updateAdds = async (req: Request) => {
       new: true,
     },
   );
-  // console.log("result", result)
+  console.log("result", result)
   return result;
 };
 const updateVideoAdds = async (req: Request) => {

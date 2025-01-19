@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import { ISwap } from './swap.interface';
+import { IReport, ISwap } from './swap.interface';
 
 const swapSchema = new Schema<ISwap>(
   {
@@ -22,26 +22,26 @@ const swapSchema = new Schema<ISwap>(
       type: Schema.Types.ObjectId,
       ref: 'Product',
       required: true,
-    }, 
+    },
     isApproved: {
       type: String,
       enum: ['pending', 'approved', 'rejected'],
       default: 'pending',
-    }, 
-    swapUserToPoint: {  
+    },
+    swapUserToPoint: {
       type: Number,
     },
-    swapUserFromPoint: {  
+    swapUserFromPoint: {
       type: Number,
     },
-    plan_type: {  
+    plan_type: {
       type: String,
-      default:"Gold"
+      default: "Gold"
     },
-    ratting:[
+    ratting: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'User', 
+        ref: 'User',
       },
     ],
   },
@@ -49,6 +49,45 @@ const swapSchema = new Schema<ISwap>(
     timestamps: true,
   },
 );
+
+
+const ReportSchema: Schema = new Schema<IReport>(
+  {
+    againstUser: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    userFrom: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    description: {
+      type: String,
+      required: true
+    },
+    swapId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Swap',
+      required: true
+    },
+    reportImage: {
+      type: [String],
+      default: []
+    },
+    replay: {
+      type: String,
+    },
+    replayed: {
+      type: Boolean,
+      default: false
+    },
+  },
+  { timestamps: true }
+);
+export const Reports = model('Reports', ReportSchema);
+
+
 export const Swap = model('Swap', swapSchema);
 
- 

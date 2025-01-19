@@ -2,6 +2,7 @@ import { Router } from 'express';
 import auth from '../../middlewares/auth';
 import { ENUM_USER_ROLE } from '../../../enums/user';
 import { SwapController } from './swap.controller';
+import { uploadFile } from '../../middlewares/fileUploader';
 
 const router = Router();
 
@@ -46,10 +47,15 @@ router.get(
   auth(ENUM_USER_ROLE.USER),
   SwapController.getSwapProductPlanType,
 );
+router.post(
+  '/create-report',
+  auth(ENUM_USER_ROLE.USER),
+  uploadFile(),
+  SwapController.createReports,
+);
 
- 
 
- 
 
- 
+
+
 export const SwapRoutes = router;

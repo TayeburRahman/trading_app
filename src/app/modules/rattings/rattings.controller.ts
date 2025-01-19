@@ -19,7 +19,7 @@ const insertIntoDB: RequestHandler = catchAsync(
 const averageRatting: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const result = await RattingService.averageRatting(req);
-    
+
     sendResponse(res, {
       statusCode: 200,
       success: true,
@@ -31,9 +31,9 @@ const averageRatting: RequestHandler = catchAsync(
 
 const myRattingAndReview: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    
+
     const result = await RattingService.myRattingAndReview(req);
-    
+
     sendResponse(res, {
       statusCode: 200,
       success: true,
