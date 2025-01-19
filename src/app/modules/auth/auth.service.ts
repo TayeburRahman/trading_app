@@ -33,26 +33,25 @@ const registrationUser = async (payload: IRegistration) => {
   const { firstName, lastName, email, password, phone_number, role, confirmPassword } =
     payload as any
 
-    console.log("Auth", role)
+  console.log("Auth", role)
 
-    if(!firstName){
-      throw new ApiError(400, "First Name is required!");
+  if (!firstName) {
+    throw new ApiError(400, "First Name is required!");
 
-    }
+  }
 
-    if(!lastName){
-      throw new ApiError(400, "Last Name is required!"); 
-    }
- 
+  if (!lastName) {
+    throw new ApiError(400, "Last Name is required!");
+  }
 
   const user = {
-    name : String(firstName+" "+lastName),
+    name: String(firstName + " " + lastName),
     email,
     password,
     phone_number,
     role,
     expirationTime: Date.now() + 5 * 60 * 1000,
-  } as unknown as IUser;  
+  } as unknown as IUser;
 
   if (password !== confirmPassword) {
     throw new ApiError(400, "Password and ConfirmPassword didn't match");
@@ -62,7 +61,7 @@ const registrationUser = async (payload: IRegistration) => {
     throw new ApiError(400, 'Email already exist');
   }
 
-  const activationToken = createActivationToken(); 
+  const activationToken = createActivationToken();
 
   const activationCode = activationToken.activationCode;
   const data = { user: { name: user.name }, activationCode };
@@ -90,19 +89,19 @@ const createActivationToken = () => {
 //!
 const activateUser = async (req: Request) => {
   const { activation_code, userEmail, deviceToken } = req.body;
-   
+
 
   const existUser = await User.findOne({ email: userEmail });
   if (!existUser) {
     throw new ApiError(400, 'User not found');
   }
-  console.log(`Activation`, existUser.activationCode, activation_code )
+  console.log(`Activation`, existUser.activationCode, activation_code)
   if (existUser.activationCode !== activation_code) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Code didn't match");
   }
   const user = (await User.findOneAndUpdate(
     { email: userEmail },
-    { isActive: true, deviceToken},
+    { isActive: true, deviceToken },
     {
       new: true,
       runValidators: true,
@@ -123,7 +122,7 @@ const activateUser = async (req: Request) => {
     title: 'Account Active Successfully.',
     body: 'You have successfully logged in to your account.',
   };
-  
+
   sendPushNotification({ fcmToken: deviceToken, payload });
 
 
@@ -184,7 +183,7 @@ const updateProfile = async (req: Request): Promise<IUser | null> => {
   }
 
   let cover_image = undefined;
-  
+
   //@ts-ignore
   if (files && files.cover_image) {
     //@ts-ignore
@@ -196,7 +195,7 @@ const updateProfile = async (req: Request): Promise<IUser | null> => {
   if (files && files.profile_image) {
     //@ts-ignore
     profile_image = `/images/profile/${files.profile_image[0].filename}`;
-  } 
+  }
 
   //@ts-ignore
   const data = req.body;
@@ -233,7 +232,7 @@ const deleteUser = async (id: string): Promise<IUser | null> => {
 };
 //!
 const loginUser = async (req: Request) => {
-  const { email, password, deviceToken} = req.body; 
+  const { email, password, deviceToken } = req.body;
 
   const isUserExist = (await User.isUserExist(email)) as IUser;
   const checkUser = await User.findOne({ email });
@@ -254,21 +253,19 @@ const loginUser = async (req: Request) => {
     );
   }
 
-    await User.findOneAndUpdate(
+  await User.findOneAndUpdate(
     { email: email },
-    { deviceToken},
+    { deviceToken },
     {
-      new: true, 
+      new: true,
     }) as IUser;
 
   const payload = {
     title: 'Login Successfully.',
     body: 'You have successfully logged in to your account.',
   };
-  
-  sendPushNotification({ fcmToken: deviceToken, payload });
 
- 
+  sendPushNotification({ fcmToken: deviceToken, payload });
 
   const { _id: userId, role } = isUserExist;
   const accessToken = jwtHelpers.createToken(
