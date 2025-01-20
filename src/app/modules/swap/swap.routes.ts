@@ -66,7 +66,7 @@ router.patch(
   SwapController.reportReports,
 );
 
-router.patch(
+router.delete(
   '/delete-report/:id',
   // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   SwapController.deleteReport,
