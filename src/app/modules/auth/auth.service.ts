@@ -248,7 +248,7 @@ const loginUser = async (req: Request) => {
     throw new ApiError(402, 'Password is incorrect');
   }
 
-  console.log("isActive", isUserExist.isActive);
+  console.log("isActive", isUserExist);
   if (!isUserExist.isActive) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,
