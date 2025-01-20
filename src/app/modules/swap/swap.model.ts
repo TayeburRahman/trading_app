@@ -47,6 +47,7 @@ const swapSchema = new Schema<ISwap>(
       {
         type: Schema.Types.ObjectId,
         ref: 'User',
+        default: []
       },
     ],
   },
