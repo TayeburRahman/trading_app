@@ -13,6 +13,7 @@ import { makeProductPoints, makeSwapPoints } from '../points/points.services';
 import { Ratting } from '../rattings/rattings.model';
 import { Types } from 'mongoose';
 import { sendPushNotification } from '../push-notification/push.notifications';
+import { Subscription } from '../subscriptions/subscriptions.model';
 
 const insertIntoDB = async (files: any, payload: IProducts, user: JwtPayload) => {
   if (!files?.product_img) {
@@ -233,11 +234,13 @@ const productForSwap = async (req: Request) => {
 };
 
 const topProducts = async (req: Request) => {
-  const users = await User.find().sort({ points: -1 });
+  // const users = await User.find().sort({ points: -1 });
+  // const userIds = users.map(user => user._id);
 
-  const userIds = users.map(user => user._id);
-
-  const products = await Product.find({ user: { $in: userIds } }).sort({
+  const products = await Product.find({
+    // user: { $in: userIds },
+    status: { $in: ['completed', 'pending'] },
+  }).sort({
     productValue: -1,
   });
 
@@ -248,13 +251,18 @@ const productJustForYou = async (req: Request) => {
   const { userId } = req.user as JwtPayload;
 
   const user = (await User.findById(userId)) as IUser;
-  const role = user?.role;
+  const userType = user?.userType;
 
-  const users = await User.find({ role: role });
+  const subscription = await Subscription.findOne({ planName: userType })
 
-  const userIds = users.map(user => user._id);
 
-  const products = await Product.find({ user: { $in: userIds } }).sort({
+
+
+
+  const products = await Product.find({
+    // user: { $in: userIds },
+    status: { $in: ['completed', 'pending'] },
+  }).sort({
     productValue: -1,
   });
 
