@@ -324,11 +324,14 @@ const getUsersSwapProduct = async (req: Request) => {
     // Add 'report' field to each swap
     const modifiedSwaps = swaps.map(swap => {
       const isReported = swap.reporting.includes(user.userId);
+      const isRetting = swap.ratting.includes(user.userId);
       return {
         ...swap.toObject(),
-        report: isReported
+        report: isReported,
+        isRetting: isRetting
       };
     });
+
 
     // If title filter is provided, apply it
     if (title) {
