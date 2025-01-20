@@ -236,7 +236,7 @@ const loginUser = async (req: Request) => {
   const { email, password, deviceToken } = req.body;
 
   const isUserExist = (await User.isUserExist(email)) as IUser;
-  const checkUser = await User.findOne({ email });
+  const checkUser = await User.findOne({ email }) as IUser;
   if (!isUserExist) {
     throw new ApiError(404, 'User does not exist');
   }
@@ -248,8 +248,8 @@ const loginUser = async (req: Request) => {
     throw new ApiError(402, 'Password is incorrect');
   }
 
-  console.log("isActive", isUserExist);
-  if (!isUserExist.isActive) {
+  console.log("isActive", checkUser);
+  if (!checkUser.isActive) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,
       'Please active your account then try to login',
