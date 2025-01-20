@@ -51,6 +51,7 @@ const registrationUser = async (payload: IRegistration) => {
     phone_number,
     role,
     expirationTime: Date.now() + 5 * 60 * 1000,
+    isActive: false
   } as unknown as IUser;
 
   if (password !== confirmPassword) {
@@ -95,7 +96,7 @@ const activateUser = async (req: Request) => {
   if (!existUser) {
     throw new ApiError(400, 'User not found');
   }
-  console.log(`Activation`, existUser.activationCode, activation_code)
+  // console.log(`Activation`, existUser.activationCode, activation_code)
   if (existUser.activationCode !== activation_code) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Code didn't match");
   }
@@ -246,7 +247,9 @@ const loginUser = async (req: Request) => {
   ) {
     throw new ApiError(402, 'Password is incorrect');
   }
-  if (isUserExist.isActive === false) {
+
+  console.log("isActive", isUserExist.isActive);
+  if (!isUserExist.isActive) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,
       'Please active your account then try to login',
