@@ -151,6 +151,19 @@ const reportReports: RequestHandler = catchAsync(
   },
 );
 
+const deleteReport: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await SwapService.deleteReport(req as any);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Delete Successfully!',
+      data: result,
+    });
+  },
+);
+
+
 
 
 
@@ -169,5 +182,6 @@ export const SwapController = {
   getSwapProductPlanType,
   createReports,
   getReports,
-  reportReports
+  reportReports,
+  deleteReport
 };

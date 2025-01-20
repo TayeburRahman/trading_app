@@ -513,7 +513,6 @@ const getReports = async (req: Request) => {
   return { result, meta }
 }
 
-
 const replayReports = async (req: Request) => {
   const user = req.user as IReqUser;
   const payload = req.body;
@@ -563,6 +562,16 @@ const replayReports = async (req: Request) => {
   return result;
 };
 
+const deleteReport = async (req: Request) => {
+  const id = req.params.id;
+  const reports = await Reports.findByIdAndDelete(id);
+  if (!reports) {
+    throw new ApiError(404, 'Report not found');
+  }
+  const result = await Reports.findByIdAndDelete(id);
+
+  return result;
+}
 
 
 export const SwapService = {
@@ -577,5 +586,6 @@ export const SwapService = {
   getSwapProductPlanType,
   createReports,
   getReports,
-  replayReports
+  replayReports,
+  deleteReport
 };
