@@ -248,13 +248,21 @@ const loginUser = async (req: Request) => {
     throw new ApiError(402, 'Password is incorrect');
   }
 
-  console.log("isActive", checkUser);
   if (!checkUser.isActive) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,
       'Please active your account then try to login',
     );
   }
+
+  if (checkUser.is_block) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      'User account is blocked. Please contact support for assistance.',
+    );
+  }
+
+
 
   await User.findOneAndUpdate(
     { email: email },
