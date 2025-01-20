@@ -17,6 +17,38 @@ import { Plan } from '../user-subscription/user-plan.model';
 import Conversation from '../messages/conversation.model';
 import { sendPushNotification } from '../push-notification/push.notifications';
 import QueryBuilder from '../../../builder/QueryBuilder';
+import { ISubscriptions } from '../subscriptions/subscriptions.interface';
+import cron from 'node-cron';
+import { logger } from '../../../shared/logger';
+
+cron.schedule('* * * * *', async () => {
+  try {
+    const pointDb = await Point.find({});
+
+    const platinum = await Subscription.findOne({ planName: 'Platinum' }) as ISubscriptions;
+    const diamond = await Subscription.findOne({ planName: 'Diamond' }) as ISubscriptions;
+
+    if (!platinum || !diamond) {
+      throw new Error('Subscription plans not found');
+    }
+
+    for (const point of pointDb) {
+      const user = await User.findById(point.user);
+      if (!user) continue;
+
+      if (platinum.pointRangeStart <= point.points && user.userType !== 'Platinum') {
+        await User.findByIdAndUpdate(point.user, { userType: 'Platinum' });
+      }
+
+      if (diamond.pointRangeStart <= point.points && user.userType !== 'Diamond') {
+        await User.findByIdAndUpdate(point.user, { userType: 'Diamond' });
+      }
+    }
+  } catch (error) {
+    logger.error('Error updating user types based on points:', error);
+  }
+});
+
 
 const makeSwap = async (req: Request) => {
   const user: any = req.user as IReqUser;
@@ -234,8 +266,6 @@ const approveSwap = async (req: Request): Promise<any> => {
       })
   ])
 
-  console.log("======", fromProduct, toProduct)
-
   const [to_product, from_product] = await Promise.all([
     Product.findByIdAndUpdate(
       toProduct._id,
@@ -248,8 +278,6 @@ const approveSwap = async (req: Request): Promise<any> => {
         status: "swapped"
       })
   ])
-
-  console.log("===fromProduct", from_product, to_product)
 
   const notificationMessage = `Accept your swap request!`;
   const notification = await Notification.create({

@@ -14,6 +14,9 @@ import { Ratting } from '../rattings/rattings.model';
 import { Types } from 'mongoose';
 import { sendPushNotification } from '../push-notification/push.notifications';
 import { Subscription } from '../subscriptions/subscriptions.model';
+import { ISubscriptions } from '../subscriptions/subscriptions.interface';
+
+
 
 const insertIntoDB = async (files: any, payload: IProducts, user: JwtPayload) => {
   if (!files?.product_img) {
@@ -71,7 +74,6 @@ const insertIntoDB = async (files: any, payload: IProducts, user: JwtPayload) =>
   return result;
 };
 
-
 const products = async (query: Record<string, unknown>) => {
   const userId = query.userId;
   const { page = 1, limit = 10 } = query;
@@ -104,7 +106,6 @@ const products = async (query: Record<string, unknown>) => {
     data: result,
   };
 };
-
 
 const myProducts = async (user: JwtPayload, query: Record<string, unknown>) => {
   query.status = ['completed', "pending"]
@@ -249,18 +250,18 @@ const topProducts = async (req: Request) => {
 
 const productJustForYou = async (req: Request) => {
   const { userId } = req.user as JwtPayload;
-
   const user = (await User.findById(userId)) as IUser;
   const userType = user?.userType;
 
-  const subscription = await Subscription.findOne({ planName: userType })
+  const subscription = await Subscription.findOne({ planName: userType }) as ISubscriptions
+  const productPriceLimit = subscription.productPriceLimit
 
-
-
-
+  if (!productPriceLimit) {
+    throw new ApiError(400, 'Your plan does not allow you to access this feature. Please try later.');
+  }
 
   const products = await Product.find({
-    // user: { $in: userIds },
+    productValue: { $lte: productPriceLimit },
     status: { $in: ['completed', 'pending'] },
   }).sort({
     productValue: -1,
