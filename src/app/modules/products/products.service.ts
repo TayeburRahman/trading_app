@@ -73,22 +73,37 @@ const insertIntoDB = async (files: any, payload: IProducts, user: JwtPayload) =>
 
 const products = async (query: Record<string, unknown>) => {
   const userId = query.userId;
-  query.status = ['completed', "pending"]
+  const { page = 1, limit = 10 } = query;
+
+  const pageNum = parseInt(page as string, 10) || 1;
+  const limitNum = parseInt(limit as string, 10) || 10;
+
+  query.status = ['completed', 'pending'];
+
   const categoryQuery = new QueryBuilder(Product.find(), query)
     .search(['title', 'address'])
     .filter()
     .sort()
-    .paginate()
     .fields();
 
-  const result = await categoryQuery.modelQuery;
-  const meta = await categoryQuery.countTotal();
+  const result = await categoryQuery.modelQuery
+    .skip((pageNum - 1) * limitNum)
+    .limit(limitNum);
+
+  const total = await categoryQuery.modelQuery.clone().countDocuments();
+  const totalPage = Math.ceil(total / limitNum);
 
   return {
-    meta,
+    meta: {
+      page: pageNum,
+      limit: limitNum,
+      total,
+      totalPage,
+    },
     data: result,
   };
 };
+
 
 const myProducts = async (user: JwtPayload, query: Record<string, unknown>) => {
   query.status = ['completed', "pending"]
