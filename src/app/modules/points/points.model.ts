@@ -3,7 +3,7 @@ import { IPoints, IPointsDetails } from './points.interface';
 
 const pointsDetailsSchema = new Schema<IPointsDetails>({
   title: {
-    type: String, 
+    type: String,
     required: true,
   },
   point: {
@@ -14,7 +14,7 @@ const pointsDetailsSchema = new Schema<IPointsDetails>({
     type: Date,
     required: true,
   },
-}); 
+});
 
 
 const pointSchema = new Schema<IPoints>(
@@ -29,7 +29,7 @@ const pointSchema = new Schema<IPoints>(
       default: 0,
     },
     details: {
-      type: [pointsDetailsSchema], 
+      type: [pointsDetailsSchema],
     },
   },
   { timestamps: true },

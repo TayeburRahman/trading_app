@@ -9,6 +9,9 @@ import { Ratting } from '../rattings/rattings.model';
 import { Plan } from '../user-subscription/user-plan.model';
 import { IPoints } from '../points/points.interface';
 import { Point } from '../points/points.model';
+import cron from 'node-cron';
+import { logger } from '../../../shared/logger';
+
 
 //!
 const registerAdmin = async (payload: IRegistration) => {
