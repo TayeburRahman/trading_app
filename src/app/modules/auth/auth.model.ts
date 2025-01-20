@@ -9,7 +9,7 @@ const UserSchema = new Schema<IUser, UserModel>(
     name: {
       type: String,
       required: true,
-    }, 
+    },
     email: {
       type: String,
       required: [true, 'Email is required'],
@@ -29,7 +29,7 @@ const UserSchema = new Schema<IUser, UserModel>(
       required: [true, 'Password is required'],
       select: false,
     },
-    deviceToken:{
+    deviceToken: {
       type: String,
       default: null,
     },
@@ -42,7 +42,7 @@ const UserSchema = new Schema<IUser, UserModel>(
     zip: {
       type: String,
     },
-    city:{
+    city: {
       type: String,
     },
     state: {
@@ -59,7 +59,7 @@ const UserSchema = new Schema<IUser, UserModel>(
     },
     userType: {
       type: String,
-      enum: ['Gold', 'Platinum', 'Diamond', 'Trial',"Expert"],
+      enum: ['Gold', 'Platinum', 'Diamond', 'Trial', "Expert"],
       default: 'Trial',
     },
     gender: {
@@ -177,12 +177,12 @@ const UserSchema = new Schema<IUser, UserModel>(
     isApproved: {
       type: Boolean,
       default: false,
-    }, 
+    },
     isSubscribed: {
       type: Boolean,
       default: false,
     },
-    planExpatDate:{
+    planExpatDate: {
       type: Date,
     },
     expirationTime: { type: Date, default: () => Date.now() + 2 * 60 * 1000 },
