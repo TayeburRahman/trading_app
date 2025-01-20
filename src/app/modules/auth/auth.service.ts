@@ -432,16 +432,19 @@ const resendActivationCode = async (payload: { email: string }) => {
   sendResetEmail(
     profile.email,
     `
-      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-      <h2 style="color: #333;">Account Activation</h2>
-      <p>Hi ${user.name},</p>
-      <p>Thank you for signing up! To activate your account, please use the following activation code:</p>
-      <h3 style="background-color: #f1f1f1; padding: 10px; border-radius: 5px; text-align: center;">
-        ${activationCode}
-      </h3>
-      <p>This code is valid for 15 minutes. If you didn't request this, please ignore this email.</p>
-      <p>Thank you!</p> 
-    </div>
+     <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+       <h2 style="color: #333;">Resend Activation Code</h2>
+       <p>Hi ${user.name},</p>
+       <p>You recently requested a new activation code. To activate your account, please use the following code:</p>
+       <h3 style="background-color: #f1f1f1; padding: 10px; border-radius: 5px; text-align: center;">
+         ${activationCode}
+       </h3>
+       <p>This code is valid for 15 minutes. If you didn't request this, you can safely ignore this email.</p>
+       <p>If you need further assistance, feel free to reach out to our support team.</p>
+       <p>Thank you!</p>
+       <p style="font-size: 0.9em; color: #555;">The [Your App Name] Team</p>
+     </div>
+
   `,
   );
 };

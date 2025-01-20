@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { ISwap } from './swap.interface';
+import { IReport, ISwap } from './swap.interface';
 import ApiError from '../../../errors/ApiError';
 import { Reports, Swap } from './swap.model';
 import User from '../auth/auth.model';
@@ -16,6 +16,7 @@ import { Types } from 'mongoose';
 import { Plan } from '../user-subscription/user-plan.model';
 import Conversation from '../messages/conversation.model';
 import { sendPushNotification } from '../push-notification/push.notifications';
+import QueryBuilder from '../../../builder/QueryBuilder';
 
 const makeSwap = async (req: Request) => {
   const user: any = req.user as IReqUser;
@@ -491,6 +492,76 @@ const createReports = async (req: Request) => {
   return result;
 };
 
+
+const getReports = async (req: Request) => {
+  const query = req.query
+  const categoryQuery = new QueryBuilder(Reports.find()
+    .populate({ path: 'againstUser', select: 'name email profile_image ' })
+    .populate({ path: 'userFrom', select: 'name email profile_image' })
+    , query)
+    // .search()
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await categoryQuery.modelQuery;
+  const meta = await categoryQuery.countTotal();
+  return { result, meta }
+}
+
+
+const replayReports = async (req: Request) => {
+  const user = req.user as IReqUser;
+  const payload = req.body;
+  const id = req.query.id;
+
+  if (!payload.description) {
+    throw new ApiError(400, 'Invalid payload: description are required');
+  }
+
+  const reports = await Reports.findById(id) as IReport
+
+  if (!reports) {
+    throw new ApiError(404, 'Report not found');
+  }
+
+  const result = await Reports.findByIdAndUpdate(
+    id,
+    { replayed: true, replay: payload.description },
+    { new: true },
+  );
+
+  // const notifications
+
+  const notificationMessage = payload.description;
+  const notification = await Notification.create({
+    title: `Your Reports Replay From Admin!`,
+    user: reports.userFrom,
+    message: notificationMessage,
+  });
+
+  const dbReceiver = await User.findById(reports.userFrom)
+  if (dbReceiver?.deviceToken) {
+    const payload = {
+      title: `Your Reports Replay From Admin!`,
+      body: notificationMessage,
+    };
+    sendPushNotification({ fcmToken: dbReceiver?.deviceToken, payload });
+  }
+
+  //@ts-ignore
+  const socketIo = global.io;
+  if (socketIo) {
+    socketIo.emit(`notification::${notification?._id.toString()}`, notification);
+  }
+
+
+  return result;
+};
+
+
+
 export const SwapService = {
   makeSwap,
   pendingSwap,
@@ -501,5 +572,7 @@ export const SwapService = {
   getUsersSwapProduct,
   partnerProfileDetails,
   getSwapProductPlanType,
-  createReports
+  createReports,
+  getReports,
+  replayReports
 };
