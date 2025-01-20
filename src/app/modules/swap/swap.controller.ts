@@ -120,11 +120,40 @@ const createReports: RequestHandler = catchAsync(
     sendResponse(res, {
       statusCode: 200,
       success: true,
-      message: 'Partner profile history successfully get!',
+      message: 'Report Create Successfully!',
       data: result,
     });
   },
 );
+
+const getReports: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await SwapService.getReports(req as any);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Report gets successfully!',
+      data: result,
+    });
+  },
+);
+
+
+const reportReports: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await SwapService.replayReports(req as any);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Replay Successfully!',
+      data: result,
+    });
+  },
+);
+
+
+
+
 
 
 
@@ -138,5 +167,7 @@ export const SwapController = {
   cancelSwapRequest,
   partnerProfileDetails,
   getSwapProductPlanType,
-  createReports
+  createReports,
+  getReports,
+  reportReports
 };

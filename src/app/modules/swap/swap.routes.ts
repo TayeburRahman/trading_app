@@ -54,6 +54,17 @@ router.post(
   SwapController.createReports,
 );
 
+router.get(
+  '/get-reports',
+  // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  SwapController.getReports,
+);
+
+router.patch(
+  '/relay-report',
+  // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  SwapController.reportReports,
+);
 
 
 

@@ -18,7 +18,7 @@ interface NotificationPayload {
 }
 
 interface SendNotificationInput {
-  fcmToken: string; // Single FCM token
+  fcmToken: string;
   payload: NotificationPayload;
 }
 
@@ -42,8 +42,8 @@ async function sendPushNotification({
     token: fcmToken,
     android: {
       notification: {
-        sound: 'default', // Android-specific sound configuration
-        priority: 'high', // Ensures high priority for sound and alert
+        sound: 'default',
+        priority: 'high',
       },
     },
     apns: {
@@ -53,7 +53,7 @@ async function sendPushNotification({
             title: payload.title,
             body: payload.body,
           },
-          sound: 'default', // iOS-specific sound configuration
+          sound: 'default',
         },
       },
     },

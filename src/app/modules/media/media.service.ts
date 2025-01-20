@@ -166,7 +166,7 @@ const addSmallBanner = async (req: any) => {
   }
 
   const result = await SmallBanner.create(payload);
-  console.log('result', result);
+
   return result;
 };
 
