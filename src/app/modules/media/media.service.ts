@@ -171,26 +171,28 @@ const addSmallBanner = async (req: any) => {
 };
 
 const updateSmallBanner = async (req: Request) => {
-  const { files } = req as any;
+  const files = req.files as any;
   const id = req.params.id;
-  if (files?.files[0].mimetype.startsWith('image')) {
+
+  if (files?.files && files?.files[0]?.mimetype.startsWith('image')) {
     req.body.type = 'image';
-  } else if (files?.files[0].mimetype.startsWith('video')) {
+  } else if (files?.files && files?.files[0]?.mimetype.startsWith('video')) {
     req.body.type = 'video';
   }
   const { ...AddsData } = req.body;
+  console.log("Updates===============:", AddsData)
 
   // Validate the ID
   if (!id) {
     throw new ApiError(400, 'Missing VideoAdds ID.');
   }
 
-  if (!AddsData || Object.keys(AddsData).length === 0) {
+  if (!AddsData || Object.keys(AddsData)?.length === 0) {
     throw new ApiError(400, 'Missing or invalid VideoAdds data.');
   }
 
   try {
-    if (files && files?.files && files?.files[0]) {
+    if (files?.files && files?.files && files?.files[0]) {
       AddsData.files = `/images/banner/${files.files[0].filename}`;
     }
 
