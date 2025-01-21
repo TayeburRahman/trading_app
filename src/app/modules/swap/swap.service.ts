@@ -49,7 +49,6 @@ cron.schedule('* * * * *', async () => {
   }
 });
 
-
 const makeSwap = async (req: Request) => {
   const user: any = req.user as IReqUser;
   const payload = req.body as ISwap;
@@ -178,7 +177,6 @@ const approveSwap = async (req: Request): Promise<any> => {
   const { id } = req.params;
   const { userId } = req.user as IReqUser;
 
-  // Fetch swap, products, and user in parallel
   const [swap, fromProduct, toProduct, user] = await Promise.all([
     Swap.findById(id).lean(),
     Swap.findById(id).select('productFrom').then(swap =>
@@ -212,7 +210,6 @@ const approveSwap = async (req: Request): Promise<any> => {
 
   const points = await makeSwapPoints({ fromProduct, toProduct }, { user, toUser });
 
-  // Update swap and user points in parallel
   const [updatedSwap, fromPoint, toPoint] = await Promise.all([
     Swap.findByIdAndUpdate(
       id,
@@ -378,7 +375,6 @@ const getUsersSwapProduct = async (req: Request) => {
   }
 };
 
-
 const getSwapProductPlanType = async (req: Request) => {
   const user = req.user as { userId: string };
   const planType = req.query.planType as string | undefined;
@@ -396,8 +392,6 @@ const getSwapProductPlanType = async (req: Request) => {
         { isApproved: 'approved' },
       ]
     };
-
-    // console.log("Generated Query:", JSON.stringify(baseQuery, null, 2));
 
     const swaps: any[] = await Swap.find(baseQuery)
       .populate({
@@ -523,7 +517,6 @@ const createReports = async (req: Request) => {
   );
   return result;
 };
-
 
 const getReports = async (req: Request) => {
   const query = req.query
