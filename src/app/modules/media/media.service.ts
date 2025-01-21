@@ -150,9 +150,9 @@ const deleteVideoAdds = async (id: string) => {
 };
 const addSmallBanner = async (req: any) => {
   const files = req.files;
-  if (files.files[0].mimetype.startsWith('image')) {
+  if (files?.files[0].mimetype.startsWith('image')) {
     req.body.type = 'image';
-  } else if (files.files[0].mimetype.startsWith('video')) {
+  } else if (files?.files[0].mimetype.startsWith('video')) {
     req.body.type = 'video';
   }
   const payload = req.body;
@@ -173,9 +173,9 @@ const addSmallBanner = async (req: any) => {
 const updateSmallBanner = async (req: Request) => {
   const { files } = req as any;
   const id = req.params.id;
-  if (files.files[0].mimetype.startsWith('image')) {
+  if (files?.files[0].mimetype.startsWith('image')) {
     req.body.type = 'image';
-  } else if (files.files[0].mimetype.startsWith('video')) {
+  } else if (files?.files[0].mimetype.startsWith('video')) {
     req.body.type = 'video';
   }
   const { ...AddsData } = req.body;
@@ -190,7 +190,7 @@ const updateSmallBanner = async (req: Request) => {
   }
 
   try {
-    if (files && files.files && files.files[0]) {
+    if (files && files?.files && files?.files[0]) {
       AddsData.files = `/images/banner/${files.files[0].filename}`;
     }
 
