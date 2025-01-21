@@ -68,11 +68,13 @@ const UserSchema = new Schema<IUser, UserModel>(
     },
     profile_image: {
       type: String,
-      default: 'https://i.ibb.co.com/sF7KDj5/profile.jpg',
+      // default: 'https://i.ibb.co.com/sF7KDj5/profile.jpg',
+      default: null,
     },
     cover_image: {
       type: String,
-      default: 'https://i.ibb.co.com/mCxGBqX/backround.jpg',
+      // default: 'https://i.ibb.co.com/mCxGBqX/backround.jpg',
+      default: null,
     },
     isPaid: {
       type: Boolean,

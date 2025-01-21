@@ -10,6 +10,7 @@ router.post(
   auth(ENUM_USER_ROLE.USER),
   PaymentController.makePaymentIntent,
 );
+
 router.post(
   '/success_intent',
   auth(ENUM_USER_ROLE.USER),
@@ -27,11 +28,5 @@ router.get(
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   PaymentController.getTransitionsHistory,
 );
-
- 
-
- 
-
- 
 
 export const PaymentRoutes = router;
