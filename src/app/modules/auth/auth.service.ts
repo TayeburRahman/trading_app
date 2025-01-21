@@ -154,10 +154,16 @@ cron.schedule('* * * * *', async () => {
     logger.error('Error deleting expired users:', error);
   }
 });
-//!
+
+
 const getAllUsers = async (
   query: Record<string, unknown>,
 ): Promise<IGenericResponse<IUser[]>> => {
+
+  if (query.searchTerm) {
+    delete query.page;
+  }
+
   const userQuery = new QueryBuilder(User.find({ role: 'USER' }), query)
     .search(userSearchableField)
     .filter()

@@ -397,7 +397,7 @@ const getSwapProductPlanType = async (req: Request) => {
       ]
     };
 
-    console.log("Generated Query:", JSON.stringify(baseQuery, null, 2));
+    // console.log("Generated Query:", JSON.stringify(baseQuery, null, 2));
 
     const swaps: any[] = await Swap.find(baseQuery)
       .populate({
@@ -445,7 +445,8 @@ const getSwapProductPlanType = async (req: Request) => {
         productFrom: swap.productFrom,
         productTo: swap.productTo,
         planType: swap.plan_type,
-        isApproved: swap.isApproved
+        isApproved: swap.isApproved,
+        createdAt: swap?.createdAt
       };
     });
 

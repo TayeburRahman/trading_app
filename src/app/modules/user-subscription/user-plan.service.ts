@@ -134,26 +134,48 @@ const updateSubscription = async (req: Request) => {
 };
 
 const AllSubscriber = async (query: Record<string, unknown>) => {
-  const subscriptionsQuery = new QueryBuilder(
-    Plan.find({ status: { $ne: 'decline' } }).populate('user_id'),
-    query,
-  )
-    .search(['plan_type'])
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
+  const { searchTerm, page = 1, limit = 10 } = query as {
+    searchTerm?: string;
+    page?: number;
+    limit?: number;
+  };
 
-  const result = await subscriptionsQuery.modelQuery;
-  const meta = await subscriptionsQuery.countTotal();
+  console.log('All Sub:', searchTerm, page, limit);
+
+  const baseQuery: any = { status: { $ne: 'decline' } };
+
+  if (searchTerm) {
+    baseQuery['user_id.name'] = { $regex: searchTerm, $options: 'i' };
+  }
+
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const subscriptionsQuery = await Plan.find(baseQuery)
+    .populate('user_id')
+    .skip(skip)
+    .limit(Number(limit));
+
+  const total = await Plan.countDocuments(baseQuery);
+  const totalPage = Math.ceil(total / Number(limit));
+
   const subscriptions = await Subscription.find({});
-  const planTypes = [...new Set(subscriptions?.map(sub => sub?.planName))];
+  const planTypes = [...new Set(subscriptions.map((sub) => sub.planName))];
+
+  const meta = {
+    page: Number(page),
+    limit: Number(limit),
+    total,
+    totalPage,
+  };
+
   return {
     meta,
-    data: result,
+    data: subscriptionsQuery,
     planTypes,
   };
 };
+
+
 
 const getSubscribeData = async (params: Record<string, unknown>) => {
   const subscriptionsQuery = await Plan.findById(params.id).populate('user_id');
