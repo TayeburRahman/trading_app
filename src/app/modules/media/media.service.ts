@@ -4,7 +4,6 @@ import QueryBuilder from '../../../builder/QueryBuilder';
 import ApiError from '../../../errors/ApiError';
 import { IAdds, IAddsVideo, IFilesVideo } from './media.interface';
 import { Adds, SmallBanner, VideoAdds } from './media.model';
-import mongoose from 'mongoose';
 
 const insertIntoDB = async (files: any, payload: IAdds) => {
   if (!files?.image) {
@@ -17,6 +16,7 @@ const insertIntoDB = async (files: any, payload: IAdds) => {
 
   return await Adds.create(payload);
 };
+
 const addVideoAdds = async (files: any, payload: IAddsVideo) => {
   // if (!files?.video) {
   //   throw new ApiError(400, 'File is missing');
@@ -27,6 +27,7 @@ const addVideoAdds = async (files: any, payload: IAddsVideo) => {
   // }
   return await VideoAdds.create(payload);
 };
+
 const allAdds = async (query: Record<string, unknown>) => {
   const addsQuery = new QueryBuilder(Adds.find(), query)
     .search([])
@@ -43,6 +44,7 @@ const allAdds = async (query: Record<string, unknown>) => {
     data: result,
   };
 };
+
 const allVideoAdds = async (query: Record<string, unknown>) => {
   const addsQuery = new QueryBuilder(VideoAdds.find(), query)
     .search([])
@@ -59,6 +61,7 @@ const allVideoAdds = async (query: Record<string, unknown>) => {
     data: result,
   };
 };
+
 const updateAdds = async (req: Request) => {
   const { files } = req as any;
   const id = req.params.id;
@@ -86,6 +89,7 @@ const updateAdds = async (req: Request) => {
   console.log("result", result)
   return result;
 };
+
 const updateVideoAdds = async (req: Request) => {
   // const { files } = req as any;
   const id = req.params.id;
@@ -132,17 +136,17 @@ const updateVideoAdds = async (req: Request) => {
     );
   }
 };
+
 const deleteAdds = async (id: string) => {
   const isExist = await Adds.findOne({ _id: id });
-
   if (!isExist) {
     throw new ApiError(404, 'Adds not found !');
   }
   return await Adds.findByIdAndDelete(id);
 };
+
 const deleteVideoAdds = async (id: string) => {
   const isExist = await VideoAdds.findOne({ _id: id });
-
   if (!isExist) {
     throw new ApiError(404, 'VideoAdds not found !');
   }
@@ -156,17 +160,13 @@ const addSmallBanner = async (req: any) => {
     req.body.type = 'video';
   }
   const payload = req.body;
-
   if (!files?.files) {
     throw new ApiError(400, 'File is missing');
   }
-
   if (files?.files) {
     payload.files = `/images/banner/${files.files[0].filename}`;
   }
-
   const result = await SmallBanner.create(payload);
-
   return result;
 };
 
@@ -180,9 +180,7 @@ const updateSmallBanner = async (req: Request) => {
     req.body.type = 'video';
   }
   const { ...AddsData } = req.body;
-  console.log("Updates===============:", AddsData)
 
-  // Validate the ID
   if (!id) {
     throw new ApiError(400, 'Missing VideoAdds ID.');
   }
@@ -195,12 +193,10 @@ const updateSmallBanner = async (req: Request) => {
     if (files?.files && files?.files && files?.files[0]) {
       AddsData.files = `/images/banner/${files.files[0].filename}`;
     }
-
     const isExist = await SmallBanner.findById(id);
     if (!isExist) {
       throw new ApiError(404, 'VideoAdds not found.');
     }
-
     const updatedData: Partial<IFilesVideo> = { ...AddsData };
     console.log('updates:', updatedData);
     const result = await SmallBanner.findOneAndUpdate(
@@ -242,12 +238,12 @@ const getSmallBanner = async (query: Record<string, unknown>) => {
 
 const deleteSmallBanner = async (id: string) => {
   const isExist = await SmallBanner.findOne({ _id: id });
-
   if (!isExist) {
     throw new ApiError(404, 'Banner not found !');
   }
   return await SmallBanner.findByIdAndDelete(id);
 };
+
 export const AddsService = {
   insertIntoDB,
   allAdds,
