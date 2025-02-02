@@ -161,9 +161,31 @@ const pendingSwap = async (req: Request) => {
 
 const cancelSwapRequest = async (req: Request) => {
   const id = req.params.id;
-  const deleteSwap = await Swap.findByIdAndDelete(id)
+
+  const swapDb = await Swap.findById(id);
+  if (!swapDb) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Swap not found");
+  }
+
+  const { productTo, productFrom } = swapDb;
+
+  if (!productTo || !productFrom) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Invalid swap products");
+  }
+
+  await Promise.all([
+    Product.findByIdAndUpdate(productFrom, { status: "pending" }),
+    Product.findByIdAndUpdate(productTo, { status: "pending" })
+  ]);
+
+  const deleteSwap = await Swap.findByIdAndDelete(id);
+  if (!deleteSwap) {
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to cancel swap");
+  }
+
   return deleteSwap;
 };
+
 
 const swapDetails = async (id: string) => {
   return await Swap.findById(id)
@@ -302,15 +324,33 @@ const approveSwap = async (req: Request): Promise<any> => {
 };
 
 const rejectSwap = async (id: string) => {
-  const isExist = await Swap.findById(id);
-  if (!isExist) {
-    throw new ApiError(404, 'Product not found');
+  const swapDb = await Swap.findById(id);
+  if (!swapDb) {
+    throw new ApiError(404, "Swap not found");
   }
-  return await Swap.findByIdAndUpdate(
+
+  const { productTo, productFrom } = swapDb;
+
+  if (!productTo || !productFrom) {
+    throw new ApiError(400, "Invalid swap products");
+  }
+
+  await Promise.all([
+    Product.findByIdAndUpdate(productFrom, { status: "pending" }),
+    Product.findByIdAndUpdate(productTo, { status: "pending" })
+  ]);
+
+  const updatedSwap = await Swap.findByIdAndUpdate(
     id,
-    { isApproved: 'rejected' },
-    { new: true },
+    { isApproved: "rejected" },
+    { new: true }
   );
+
+  if (!updatedSwap) {
+    throw new ApiError(500, "Failed to reject swap");
+  }
+
+  return updatedSwap;
 };
 
 const getUsersSwapProduct = async (req: Request) => {
