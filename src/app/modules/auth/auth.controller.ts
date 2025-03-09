@@ -137,8 +137,8 @@ const resendActivationCode: RequestHandler = catchAsync(
   },
 );
 
+// const token = req.headers.authorization || '';
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
-  // const token = req.headers.authorization || '';
   await AuthService.resetPassword(req.body);
   sendResponse(res, {
     statusCode: 200,
