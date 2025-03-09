@@ -52,7 +52,7 @@ router.get(
 
 router.patch(
   '/user-block-unblock/:id',
-  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.USER, ENUM_USER_ROLE.SUPER_ADMIN),
   AuthController.block_unblockUser,
 );
 
