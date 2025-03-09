@@ -556,6 +556,8 @@ const block_unblockUser = async (id: string): Promise<IUser | null> => {
     { new: true },
   );
 
+  console.log("updates all", result);
+
   return result;
 };
 
