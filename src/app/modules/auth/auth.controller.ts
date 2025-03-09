@@ -158,6 +158,7 @@ const deleteMyAccount = catchAsync(async (req: Request, res: Response) => {
 
 const block_unblockUser = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
+  console.log("block_unblockUser", id)
   const result: any = await AuthService.block_unblockUser(id);
   sendResponse<IUser>(res, {
     statusCode: 200,
