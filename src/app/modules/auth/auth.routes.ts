@@ -56,6 +56,12 @@ router.patch(
   AuthController.block_unblockUser,
 );
 
+router.post(
+  '/user-blockUnblock/:id',
+  AuthController.block_unblockUser,
+);
+
+
 //! Admin Authentication Start
 router.post(
   '/admin/register',
