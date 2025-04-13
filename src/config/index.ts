@@ -10,6 +10,8 @@ export default {
   port: process.env.PORT,
   socket_port: process.env.SOCKET_PORT,
   ip: process.env.IP,
+  subscriptions_feature: process.env.SUBSCRIPTIONS_FEATURA,
+  default_user: process.env.DEFAULT_USER,
   base_url: process.env.BASE_URL,
   database_url: process.env.MONGO_URL,
   database_password: process.env.DB_PASSWORD,

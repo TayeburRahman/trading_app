@@ -3,7 +3,7 @@
 
 import { Types } from 'mongoose';
 import ApiError from '../../../errors/ApiError';
-import { IRegistration, IReqUser } from '../auth/auth.interface';
+import { IRegistration, IReqUser, IUser } from '../auth/auth.interface';
 import User from '../auth/auth.model';
 import { Ratting } from '../rattings/rattings.model';
 import { Plan } from '../user-subscription/user-plan.model';
@@ -11,6 +11,7 @@ import { IPoints } from '../points/points.interface';
 import { Point } from '../points/points.model';
 import cron from 'node-cron';
 import { logger } from '../../../shared/logger';
+import config from '../../../config';
 
 
 //!
@@ -87,9 +88,35 @@ const getUserProfile = async (req: any) => {
   return result;
 };
 
+
+
+const subscriptionsFeature = async (req: any) => {
+  const user = req.user as IReqUser;
+
+  const userDb = await User.findById(user.userId) as IUser;
+
+  if (!userDb) {
+    throw new ApiError(400, "User Not Found!")
+  }
+
+  let result = false
+
+  if (config.subscriptions_feature === "true" && userDb.email.toString() === config?.default_user?.toString()) {
+    result = false
+  } else if (config.subscriptions_feature === "true") {
+    result = true;
+  } else {
+    result = false
+  }
+
+  return result;
+};
+
+
 export const AdminService = {
   registerAdmin,
   getAllAdmin,
   getMyProfile,
   getUserProfile,
+  subscriptionsFeature
 };
