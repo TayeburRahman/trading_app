@@ -47,9 +47,23 @@ const getUserProfile = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const subscriptionsFeature = catchAsync(async (req: Request, res: Response) => {
+  const result = await AdminService.subscriptionsFeature(req);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'successfully get!',
+    data: result,
+  });
+});
+
+
+
 export const AdminController = {
   registerAdmin,
   getAllAdmin,
   getMyProfile,
   getUserProfile,
+  subscriptionsFeature
 };
