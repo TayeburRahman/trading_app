@@ -99,5 +99,4 @@ router.get(
   AdminController.subscriptionsFeature,
 );
 
-
 export const AuthRoutes = router;
