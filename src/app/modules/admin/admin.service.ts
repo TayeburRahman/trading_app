@@ -101,15 +101,14 @@ const subscriptionsFeature = async (req: any) => {
 
   let result = false
 
-  if (config.subscriptions_feature === "true" && userDb.email.toString() === config?.default_user?.toString()) {
+  if (config.subscriptions_feature === "TEST" && userDb.email.toString() === config?.default_user?.toString()) {
     result = false
-  } else if (config.subscriptions_feature === "true") {
+  } else if (config.subscriptions_feature === "TEST") {
     result = true;
   } else {
     result = false
   }
-
-  return result;
+  return { result };
 };
 
 
