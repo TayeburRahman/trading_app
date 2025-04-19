@@ -50,13 +50,13 @@ export const registrationSuccessEmailBody = (userData: any) => `
     </head>
     <body>
       <div class="container">
-        <h1>Welcome to Dog Website</h1>
+        <h1>Welcome to Swift Swap</h1>
         <p>Hello ${userData?.user?.name},</p>
-        <p>Thank you for registering with Dog Website. To activate your account, please use the following activation code:</p>
+        <p>Thank you for registering with Swift Swap. To activate your account, please use the following activation code:</p>
         <h1>${userData?.activationCode}</h1>
         <p>Please enter this code on the activation page within the next 5 minutes.</p>
-        <p>If you didn't register for Dog Website, please ignore this email.</p>
-        <p>If you have any questions, please contact us at <a href="mailto:yeasinarafat1734@gmail.com">yeasinarafat1734@gmail.com</a>.</p>
+        <p>If you didn't register for Swift Swap, please ignore this email.</p>
+        <p>If you have any questions, please contact us at <a href="mailto:j.malave.dejesus@gmail.com">j.malave.dejesus@gmail.com</a>.</p>
       </div>
     </body>
   </html>
