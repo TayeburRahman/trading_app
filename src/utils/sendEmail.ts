@@ -3,6 +3,8 @@ import nodemailer, { Transporter } from 'nodemailer';
 import config from '../config';
 import { formattedDate } from './utils';
 import { IEmailOptions } from '../app/modules/auth/auth.interface';
+import { errorLogger } from '../shared/logger';
+import ApiError from '../errors/ApiError';
 
 const sendEmail = async (options: IEmailOptions): Promise<void> => {
   const transporter: Transporter = nodemailer.createTransport({
@@ -20,11 +22,24 @@ const sendEmail = async (options: IEmailOptions): Promise<void> => {
     from: `${config.smtp.NAME} <${config.smtp.smtp_mail}>`,
     to: email,
     date: formattedDate,
-    signed_by: 'bdCalling.com',
+    signed_by: 'https://swiftswapp.com',
     subject,
     html,
   };
-  await transporter.sendMail(mailOptions);
+
+  try {
+
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log('✅ Email sent:', info.response);
+  } catch (err: any) {
+    errorLogger.error('❌ SMTP Error:', err.message);
+    if (err.code === 'ETIMEDOUT' || err.message.includes('timeout')) {
+      errorLogger.error('SMTP timeout. Restarting server...');
+      process.exit(1);
+    }
+    throw new ApiError(400, `${err.message}`)
+  }
 };
 
 export default sendEmail;
