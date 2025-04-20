@@ -76,6 +76,7 @@ const registrationUser = async (payload: IRegistration) => {
   } catch (error: any) {
     throw new ApiError(500, `${error.message}`);
   }
+
   user.activationCode = activationCode;
   await User.create(user);
   return user;
@@ -406,17 +407,21 @@ const resendVerificationCode = async (payload: { email: string }) => {
   user.verifyExpire = expiryTime;
   await user.save();
 
-  sendResetEmail(
-    profile.email,
-    `
-      <div>
-        <p>Hi, ${profile.name}</p>
-        
-        <p>Your password reset Code: ${activationCode}</p>
-        <p>Thank you</p>
-      </div>
-  `,
-  );
+  try {
+    sendResetEmail(
+      profile.email,
+      ` <div>
+          <p>Hi, ${profile.name}</p>
+          <p>Your password reset Code: ${activationCode}</p>
+          <p>Thank you</p>
+        </div>
+      `,
+    );
+  } catch (error) {
+    console.error('Failed to send reset email:', error);
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to send password reset email. Please try again later.');
+  }
+
 };
 //
 const resendActivationCode = async (payload: { email: string }) => {
@@ -446,9 +451,10 @@ const resendActivationCode = async (payload: { email: string }) => {
   user.verifyExpire = expiryTime;
   await user.save();
 
-  sendResetEmail(
-    profile.email,
-    `
+  try {
+    sendResetEmail(
+      profile.email,
+      `
      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
        <h2 style="color: #333;">Resend Activation Code</h2>
        <p>Hi ${user.name},</p>
@@ -463,7 +469,12 @@ const resendActivationCode = async (payload: { email: string }) => {
      </div>
 
   `,
-  );
+    );
+  } catch (error) {
+    console.error('Failed to send reset email:', error);
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to send password reset email. Please try again later.');
+  }
+
 };
 // Code verify - done
 cron.schedule('* * * * *', async () => {
