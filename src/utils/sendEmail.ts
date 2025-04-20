@@ -30,14 +30,15 @@ const sendEmail = async (options: IEmailOptions): Promise<void> => {
   try {
 
     const info = await transporter.sendMail(mailOptions);
-
     console.log('✅ Email sent:', info.response);
+
   } catch (err: any) {
     errorLogger.error('❌ SMTP Error:', err.message);
-    if (err.code === 'ETIMEDOUT' || err.message.includes('timeout')) {
-      errorLogger.error('SMTP timeout. Restarting server...');
-      process.exit(0);
-    }
+
+    // if (err.code === 'ETIMEDOUT' || err.message.includes('timeout')) {
+    //   errorLogger.error('SMTP timeout. Restarting server...');
+    //   process.exit(0);
+    // }
     throw new ApiError(400, `${err.message}`)
   }
 };
