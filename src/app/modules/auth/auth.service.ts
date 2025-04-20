@@ -367,17 +367,21 @@ const forgotPass = async (payload: { email: string }) => {
   user.verifyCode = activationCode;
   user.verifyExpire = expiryTime;
   await user.save();
-
-  sendResetEmail(
-    user.email,
-    `
+  try {
+    sendResetEmail(
+      user.email,
+      `
       <div>
         <p>Hi, ${user.name}</p>
         <p>Your password reset Code: ${activationCode}</p>
         <p>Thank you</p>
       </div>
   `,
-  );
+    );
+  } catch (error: any) {
+    throw new ApiError(500, `${error.message}`);
+  }
+  return;
 };
 //!
 const resendVerificationCode = async (payload: { email: string }) => {
