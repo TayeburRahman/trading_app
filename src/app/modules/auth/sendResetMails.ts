@@ -27,10 +27,10 @@ export async function sendResetEmail(to: string, html: string) {
 
   } catch (err: any) {
     errorLogger.error('❌ SMTP Error:', err.message);
-    if (err.code === 'ETIMEDOUT' || err.message.includes('timeout')) {
-      errorLogger.error('SMTP timeout. Restarting server...');
-      process.exit(0);
-    }
+    // if (err.code === 'ETIMEDOUT' || err.message.includes('timeout')) {
+    //   errorLogger.error('SMTP timeout. Restarting server...');
+    //   process.exit(0);
+    // }
     throw new ApiError(400, `${err.message}`)
 
   }
