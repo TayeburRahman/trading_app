@@ -36,7 +36,7 @@ const sendEmail = async (options: IEmailOptions): Promise<void> => {
     errorLogger.error('❌ SMTP Error:', err.message);
     if (err.code === 'ETIMEDOUT' || err.message.includes('timeout')) {
       errorLogger.error('SMTP timeout. Restarting server...');
-      process.exit(1);
+      process.exit(0);
     }
     throw new ApiError(400, `${err.message}`)
   }

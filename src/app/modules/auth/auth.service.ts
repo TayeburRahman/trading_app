@@ -421,7 +421,7 @@ const resendVerificationCode = async (payload: { email: string }) => {
     console.error('Failed to send reset email:', error);
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to send password reset email. Please try again later.');
   }
-
+  return;
 };
 //
 const resendActivationCode = async (payload: { email: string }) => {
@@ -474,7 +474,7 @@ const resendActivationCode = async (payload: { email: string }) => {
     console.error('Failed to send reset email:', error);
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to send password reset email. Please try again later.');
   }
-
+  return;
 };
 // Code verify - done
 cron.schedule('* * * * *', async () => {
