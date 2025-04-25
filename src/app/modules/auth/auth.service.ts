@@ -66,7 +66,6 @@ const registrationUser = async (payload: IRegistration) => {
 
   const activationCode = activationToken.activationCode;
   const data = { user: { name: user.name }, activationCode };
-
   // try {
   //   sendEmail({
   //     email: user.email,
@@ -210,8 +209,6 @@ const updateProfile = async (req: Request): Promise<IUser | null> => {
   if (!data) {
     throw new Error('Data is missing in the request body!');
   }
-
-  // const parsedData = JSON.parse(data);
 
   const isExist = await User.findOne({ _id: userId });
 
