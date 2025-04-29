@@ -14,6 +14,8 @@ export async function sendResetEmail(to: string, html: string) {
     },
   });
 
+  console.log("=======", config.smtp.smtp_port)
+
   try {
 
     const info = await transporter.sendMail({
