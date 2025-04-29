@@ -31,6 +31,11 @@ export default {
     smtp_password: process.env.SMTP_PASSWORD,
     NAME: process.env.SERVICE_NAME,
   },
+  mailgun: {
+    api_key: process.env.MAILGUN_API_KEY,
+    domain: process.env.MAILGUN_DOMAIN,
+    from: process.env.MAILGUN_FROM,
+  },
   cloudinary: {
     cloud_name: process.env.CLOUD_NAME,
     api_key: process.env.API_KEY,

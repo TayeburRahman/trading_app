@@ -8,15 +8,12 @@ import ApiError from '../errors/ApiError';
 
 const sendEmail = async (options: IEmailOptions): Promise<void> => {
   const transporter: Transporter = nodemailer.createTransport({
-    host: config.smtp.smtp_host,
-    port: parseInt(config.smtp.smtp_port as string),
+    service: 'gmail',
     auth: {
       user: config.smtp.smtp_mail,
       pass: config.smtp.smtp_password,
     },
   });
-
-  console.log('=========', config.smtp.smtp_port)
 
   const { email, subject, html } = options;
 
