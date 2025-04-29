@@ -58,7 +58,7 @@ const registrationUser = async (payload: IRegistration) => {
     throw new ApiError(400, "Password and ConfirmPassword didn't match");
   }
   const isEmailExist = await User.findOne({ email });
-  if (isEmailExist) {
+  if (isEmailExist?.isActive) {
     throw new ApiError(400, 'Email already exist');
   }
 

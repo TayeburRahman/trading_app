@@ -5,9 +5,10 @@ import ApiError from '../../../errors/ApiError';
 
 export async function sendResetEmail(to: string, html: string) {
   const transporter = nodemailer.createTransport({
+    service: config.smtp.smtp_service,
     host: config.smtp.smtp_host,
     port: parseInt(config.smtp.smtp_port as string),
-    secure: Number(config.smtp.smtp_port) === 465,
+    secure: true,
     auth: {
       user: config.smtp.smtp_mail,
       pass: config.smtp.smtp_password,
