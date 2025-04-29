@@ -16,6 +16,8 @@ const sendEmail = async (options: IEmailOptions): Promise<void> => {
     },
   });
 
+  console.log('=========', config.smtp.smtp_port)
+
   const { email, subject, html } = options;
 
   const mailOptions = {

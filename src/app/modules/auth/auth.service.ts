@@ -66,15 +66,15 @@ const registrationUser = async (payload: IRegistration) => {
 
   const activationCode = activationToken.activationCode;
   const data = { user: { name: user.name }, activationCode };
-  // try {
-  //   sendEmail({
-  //     email: user.email,
-  //     subject: 'Activate Your Account',
-  //     html: registrationSuccessEmailBody(data),
-  //   });
-  // } catch (error: any) {
-  //   throw new ApiError(500, `${error.message}`);
-  // }
+  try {
+    sendEmail({
+      email: user.email,
+      subject: 'Activate Your Account',
+      html: registrationSuccessEmailBody(data),
+    });
+  } catch (error: any) {
+    throw new ApiError(500, `${error.message}`);
+  }
 
   user.activationCode = activationCode;
   await User.create(user);
@@ -364,20 +364,20 @@ const forgotPass = async (payload: { email: string }) => {
   user.verifyCode = activationCode;
   user.verifyExpire = expiryTime;
   await user.save();
-  // try {
-  //   sendResetEmail(
-  //     user.email,
-  //     `
-  //     <div>
-  //       <p>Hi, ${user.name}</p>
-  //       <p>Your password reset Code: ${activationCode}</p>
-  //       <p>Thank you</p>
-  //     </div>
-  // `,
-  //   );
-  // } catch (error: any) {
-  //   throw new ApiError(500, `${error.message}`);
-  // }
+  try {
+    sendResetEmail(
+      user.email,
+      `
+      <div>
+        <p>Hi, ${user.name}</p>
+        <p>Your password reset Code: ${activationCode}</p>
+        <p>Thank you</p>
+      </div>
+  `,
+    );
+  } catch (error: any) {
+    throw new ApiError(500, `${error.message}`);
+  }
   return;
 };
 
@@ -409,19 +409,19 @@ const resendVerificationCode = async (payload: { email: string }) => {
   user.verifyExpire = expiryTime;
   await user.save();
 
-  // try {
-  //   sendResetEmail(
-  //     profile.email,
-  //     ` <div>
-  //         <p>Hi, ${profile.name}</p>
-  //         <p>Your password reset Code: ${activationCode}</p>
-  //         <p>Thank you</p>
-  //       </div>
-  //     `,
-  //   );
-  // } catch (error: any) {
-  //   throw new ApiError(500, `${error.message}`);
-  // }
+  try {
+    sendResetEmail(
+      profile.email,
+      ` <div>
+          <p>Hi, ${profile.name}</p>
+          <p>Your password reset Code: ${activationCode}</p>
+          <p>Thank you</p>
+        </div>
+      `,
+    );
+  } catch (error: any) {
+    throw new ApiError(500, `${error.message}`);
+  }
 
   return;
 };
@@ -453,28 +453,28 @@ const resendActivationCode = async (payload: { email: string }) => {
   user.verifyExpire = expiryTime;
   await user.save();
 
-  // try {
-  //   sendResetEmail(
-  //     profile.email,
-  //     `
-  //    <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-  //      <h2 style="color: #333;">Resend Activation Code</h2>
-  //      <p>Hi ${user.name},</p>
-  //      <p>You recently requested a new activation code. To activate your account, please use the following code:</p>
-  //      <h3 style="background-color: #f1f1f1; padding: 10px; border-radius: 5px; text-align: center;">
-  //        ${activationCode}
-  //      </h3>
-  //      <p>This code is valid for 15 minutes. If you didn't request this, you can safely ignore this email.</p>
-  //      <p>If you need further assistance, feel free to reach out to our support team.</p>
-  //      <p>Thank you!</p>
-  //      <p style="font-size: 0.9em; color: #555;">The [Your App Name] Team</p>
-  //    </div>
+  try {
+    sendResetEmail(
+      profile.email,
+      `
+     <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+       <h2 style="color: #333;">Resend Activation Code</h2>
+       <p>Hi ${user.name},</p>
+       <p>You recently requested a new activation code. To activate your account, please use the following code:</p>
+       <h3 style="background-color: #f1f1f1; padding: 10px; border-radius: 5px; text-align: center;">
+         ${activationCode}
+       </h3>
+       <p>This code is valid for 15 minutes. If you didn't request this, you can safely ignore this email.</p>
+       <p>If you need further assistance, feel free to reach out to our support team.</p>
+       <p>Thank you!</p>
+       <p style="font-size: 0.9em; color: #555;">The [Your App Name] Team</p>
+     </div>
 
-  // `,
-  //   );
-  // } catch (error: any) {
-  //   throw new ApiError(500, `${error.message}`);
-  // }
+  `,
+    );
+  } catch (error: any) {
+    throw new ApiError(500, `${error.message}`);
+  }
 
   return;
 };
