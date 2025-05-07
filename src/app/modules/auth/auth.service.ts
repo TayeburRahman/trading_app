@@ -54,13 +54,13 @@ const registrationUser = async (payload: IRegistration) => {
     isActive: false
   } as unknown as IUser;
 
-  // if (password !== confirmPassword) {
-  //   throw new ApiError(400, "Password and ConfirmPassword didn't match");
-  // }
-  // const isEmailExist = await User.findOne({ email });
-  // if (isEmailExist?.isActive) {
-  //   throw new ApiError(400, 'Email already exist');
-  // }
+  if (password !== confirmPassword) {
+    throw new ApiError(400, "Password and ConfirmPassword didn't match");
+  }
+  const isEmailExist = await User.findOne({ email });
+  if (isEmailExist?.isActive) {
+    throw new ApiError(400, 'Email already exist');
+  }
 
   const activationToken = createActivationToken();
 
@@ -76,8 +76,8 @@ const registrationUser = async (payload: IRegistration) => {
     throw new ApiError(500, `${error.message}`);
   }
 
-  // user.activationCode = activationCode;
-  // await User.create(user);
+  user.activationCode = activationCode;
+  await User.create(user);
   return user;
 };
 
