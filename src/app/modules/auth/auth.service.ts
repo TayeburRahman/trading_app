@@ -467,7 +467,7 @@ const resendActivationCode = async (payload: { email: string }) => {
        <p>This code is valid for 15 minutes. If you didn't request this, you can safely ignore this email.</p>
        <p>If you need further assistance, feel free to reach out to our support team.</p>
        <p>Thank you!</p>
-       <p style="font-size: 0.9em; color: #555;">The [Your App Name] Team</p>
+       <p style="font-size: 0.9em; color: #555;">Swiftswap Team</p>
      </div>
 
   `,
