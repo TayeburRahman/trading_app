@@ -35,6 +35,7 @@ export default {
     api_key: process.env.MAILGUN_API_KEY,
     domain: process.env.MAILGUN_DOMAIN,
     from: process.env.MAILGUN_FROM,
+    name: process.env.SERVICE_NAME,
   },
   cloudinary: {
     cloud_name: process.env.CLOUD_NAME,
