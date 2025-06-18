@@ -103,10 +103,13 @@ const subscriptionsFeature = async (req: any) => {
 
   if (config.subscriptions_feature === "LIVE" && userDb.email.toString() === config?.default_user?.toString()) {
     result = false
+    console.log("===", 1)
   } else if (config.subscriptions_feature === "LIVE") {
     result = true;
+    console.log("===", 2)
   } else {
     result = false
+    console.log("===", 3)
   }
   return { result };
 };
