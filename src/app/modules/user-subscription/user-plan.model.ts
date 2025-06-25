@@ -111,7 +111,7 @@ const subscriptionSchema = new Schema<IUpgradePlan>({
     type: String,
   },
   datesOfTravel: {
-    type: Date,
+    type: String,
   },
   startDestination: {
     type: String,

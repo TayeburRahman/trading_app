@@ -157,7 +157,7 @@ const UserSchema = new Schema<IUser, UserModel>(
       type: String,
     },
     datesOfTravel: {
-      type: Date,
+      type: String,
     },
     verifyCode: {
       type: String,

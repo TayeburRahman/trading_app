@@ -8,8 +8,8 @@ import { ISubscriptions } from '../subscriptions/subscriptions.interface';
 
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 
-const makePaymentIntent = async (payload: { amount: any }) => { 
-  const amount = Math.trunc(payload.amount * 100); 
+const makePaymentIntent = async (payload: { amount: any }) => {
+  const amount = Math.trunc(payload.amount * 100);
 
   const paymentIntent = await stripe.paymentIntents.create({
     amount,
@@ -20,9 +20,9 @@ const makePaymentIntent = async (payload: { amount: any }) => {
   const data = {
     client_secret: paymentIntent.client_secret,
     transactionId: paymentIntent.id,
-  }; 
+  };
   return data;
-}; 
+};
 
 const paymentSuccessAndSave = async (payload: {
   amount: number;
@@ -48,7 +48,7 @@ const paymentSuccessAndSave = async (payload: {
 
   if (!subscriptionPlan) {
     throw new ApiError(404, "Subscription plan not found.");
-  } 
+  }
   const startDate = new Date();
   const endDate = new Date(startDate);
   endDate.setMonth(endDate.getMonth() + 1);
@@ -61,7 +61,7 @@ const paymentSuccessAndSave = async (payload: {
       planStartDate: startDate,
       planEndDate: endDate,
     },
-    { new: true }  
+    { new: true }
   );
 
   if (!update) {
@@ -72,22 +72,22 @@ const paymentSuccessAndSave = async (payload: {
 
   return { payment: result, plan: update };
 };
-  
+
 const getGoldIncome = async () => {
-  try { 
+  try {
     const goldPlan = await Subscription.findOne({ planName: 'Gold' });
     if (!goldPlan) {
       return { message: 'Gold plan not found.' };
     }
 
-    const goldPlanId = goldPlan._id;  
+    const goldPlanId = goldPlan._id;
     // console.log('Gold Plan ID:', goldPlanId);
 
     // Fetch total income for Gold plan
     const totalIncomeForGold = await Payment.aggregate([
       {
         $match: {
-          package_id: goldPlanId,  
+          package_id: goldPlanId,
         },
       },
       {
@@ -96,8 +96,8 @@ const getGoldIncome = async () => {
           totalIncome: { $sum: '$amount' },
         },
       },
-    ]); 
- 
+    ]);
+
     return {
       planType: 'Gold',
       totalIncome: totalIncomeForGold[0]?.totalIncome || 0,
@@ -148,7 +148,7 @@ const getPlatinumIncome = async () => {
 };
 
 const getDiamondIncome = async () => {
-  try { 
+  try {
     const diamondPlan = await Subscription.findOne({ planName: 'Diamond' });
     const diamondPlanId = diamondPlan ? diamondPlan._id : null;
 
@@ -157,17 +157,17 @@ const getDiamondIncome = async () => {
     }
 
     // console.log('Diamond Plan ID:', diamondPlanId);
- 
+
     const totalIncomeForDiamond = await Payment.aggregate([
       {
         $match: {
-          package_id: diamondPlanId,  
+          package_id: diamondPlanId,
         },
       },
       {
         $group: {
           _id: null,
-          totalIncome: { $sum: '$amount' },  
+          totalIncome: { $sum: '$amount' },
         },
       },
     ]);
@@ -203,12 +203,12 @@ const getAllPlanIncome = async () => {
 
 const getTransitionsHistory = async () => {
   const payments = await Payment.find({})
-   .populate('user', 'name email address')
-   .populate('plan_id', 'plan_type') 
-   .populate('package_id') 
-   .sort({ createdAt: -1 });
+    .populate('user', 'name email address')
+    .populate('plan_id', 'plan_type')
+    .populate('package_id')
+    .sort({ createdAt: -1 });
 
-   return payments;
+  return payments;
 }
 
-export const PaymentService = { makePaymentIntent, paymentSuccessAndSave, getAllPlanIncome, getTransitionsHistory};
+export const PaymentService = { makePaymentIntent, paymentSuccessAndSave, getAllPlanIncome, getTransitionsHistory };

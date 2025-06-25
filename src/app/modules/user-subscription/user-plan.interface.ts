@@ -34,7 +34,7 @@ export type IUpgradePlan = {
   utilitiesUptoDate: string;
   aboutSwap: string;
   departureArrival: string;
-  datesOfTravel: Date;
+  datesOfTravel: string;
   startDestination: string;
   startState: string;
   travelStartCounty: string;
