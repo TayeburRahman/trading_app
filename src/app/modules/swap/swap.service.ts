@@ -58,11 +58,10 @@ const makeSwap = async (req: Request) => {
     throw new ApiError(404, 'Requested User not found');
   }
 
-  const subscription = await Plan.findOne({ user_id: user.userId }).populate("plan_id");
-
-  if (!subscription?.active) {
-    throw new ApiError(404, 'You do not have an active subscription plan. Please subscribe to a plan to proceed.');
-  }
+  // const subscription = await Plan.findOne({ user_id: user.userId }).populate("plan_id");
+  // if (!subscription?.active) {
+  //   throw new ApiError(404, 'You do not have an active subscription plan. Please subscribe to a plan to proceed.');
+  // }
 
   console.log("payload", payload)
 
@@ -79,13 +78,11 @@ const makeSwap = async (req: Request) => {
     throw new ApiError(400, 'You cannot swap a product with yourself.');
   }
 
-  const subscriptionTo = await Plan.findOne({ user_id: payload.userTo }).populate("plan_id");
-
-  console.log("package_id", subscriptionTo?.active)
-
-  if (!subscriptionTo?.active) {
-    throw new ApiError(404, 'User does not have an active subscription plan. Please find another user.');
-  }
+  // const subscriptionTo = await Plan.findOne({ user_id: payload.userTo }).populate("plan_id");
+  // console.log("package_id", subscriptionTo?.active)
+  // if (!subscriptionTo?.active) {
+  //   throw new ApiError(404, 'User does not have an active subscription plan. Please find another user.');
+  // }
 
   const result = await Swap.create({
     userFrom: user.userId,
