@@ -12,10 +12,10 @@ app.use(
   cors({
     origin: [
       "https://swiftswapp.com",
-      "http://localhost:3001",
+      "http://localhost:3000",
       "http://10.0.60.43:3003",
       "http://192.168.12.90:3003",
-      "http://localhost:3000",
+      "http://10.10.20.11:3000",
       "http://10.0.60.43:3002",
       "https://www.swiftswapp.com",
       "https://dashboard.swiftswapp.com",
