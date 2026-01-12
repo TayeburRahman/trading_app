@@ -8,50 +8,6 @@ import { Server, Socket } from 'socket.io';
 import { sendPushNotification } from '../push-notification/push.notifications';
 import { IUser } from '../auth/auth.interface';
 
-//* One to one conversation
-// const sendMessage = async (req: Request) => {
-//   const { id: receiverId } = req.params;
-//   const senderId = req.user?.userId;
-//   const data = req.body;
-
-//   const { message } = data;
-
-//   if (receiverId === null || senderId === null) {
-//     throw new ApiError(404, 'Sender or Receiver user not found');
-//   }
-
-//   let conversation = await Conversation.findOne({
-//     participants: { $all: [senderId, receiverId] },
-//   });
-
-//   if (!conversation) {
-//     conversation = await Conversation.create({
-//       participants: [senderId, receiverId],
-//     });
-
-//     const newMessage = new Message({
-//       senderId,
-//       receiverId,
-//       message,
-//       conversationId: conversation._id,
-//     });
-
-//     if (newMessage) {
-//       conversation.messages.push(newMessage._id);
-//     }
-//     await Promise.all([conversation.save(), newMessage.save()]);
-//     //@ts-ignore
-//     const socketIO = global.io;
-//     if (socketIO && conversation && newMessage) {
-//       //@ts-ignore
-//       // socketIO.to(receiverId).emit('getMessage', newMessage);
-//       socketIO.emit(`message::${conversation._id.toString()}`, newMessage);
-//     }
-
-//     return newMessage;
-//   }
-// };
-
 interface NewMessageData {
   receiverId: string;
   text: string;
@@ -62,6 +18,7 @@ interface NewMessageData {
 }
 
 const sendMessage = async (senderId: any, socket: Socket, io: Server): Promise<void> => {
+
   socket.on('new-message', async (data: NewMessageData) => {
     try {
       const { receiverId, message, userType, files } = data as any;
@@ -207,7 +164,7 @@ const getMessages = async (req: Request, res: Response) => {
       return res.status(200).json({ messages: [], total: 0 });
     }
 
-    const messages = conversation.messages.reverse();
+    const messages = conversation.messages;
     const totalMessages = await Message.countDocuments({
       conversationId: conversation._id,
     });
