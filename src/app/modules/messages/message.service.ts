@@ -149,29 +149,42 @@ const getMessages = async (req: Request, res: Response) => {
     const skip = (Number(page) - 1) * Number(limit);
     const limitMessages = Number(limit);
 
+    // Find conversation
     const conversation = await Conversation.findOne({
       participants: { $all: [senderId, receiverId] },
-    }).populate({
-      path: 'messages',
-      options: {
-        skip,
-        limit: limitMessages,
-        sort: { createdAt: 1 },
-      },
     });
 
     if (!conversation) {
-      return res.status(200).json({ messages: [], total: 0 });
+      return res.status(200).json({
+        userDetails: null,
+        messages: [],
+        totalMessages: 0,
+        totalPages: 0,
+        currentPage: Number(page),
+        pageSize: Number(limit),
+        lastMessage: null,
+      });
     }
 
-    const messages = conversation.messages;
+    // Get paginated messages
+    const messages = await Message.find({ conversationId: conversation._id })
+      .sort({ createdAt: 1 }) // oldest first for pagination
+      .skip(skip)
+      .limit(limitMessages);
+
+    // Total messages and pages
     const totalMessages = await Message.countDocuments({
       conversationId: conversation._id,
     });
-
     const totalPages = Math.ceil(totalMessages / limitMessages);
 
-    const userDetails = await User.findById(receiverId)
+    // Get the latest message quickly
+    const lastMessage = await Message.findOne({ conversationId: conversation._id })
+      .sort({ createdAt: -1 }) // newest first
+      .limit(1);
+
+    // User details for receiver
+    const userDetails = await User.findById(receiverId);
 
     return res.status(200).json({
       userDetails,
@@ -180,10 +193,11 @@ const getMessages = async (req: Request, res: Response) => {
       totalPages,
       currentPage: Number(page),
       pageSize: Number(limit),
+      lastMessage: lastMessage || null,
     });
   } catch (error: any) {
-    console.log('Error in getMessages controller: ', error.message);
-    res.status(500).json({ error: 'Internal server error' });
+    console.log("Error in getMessages controller:", error.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
