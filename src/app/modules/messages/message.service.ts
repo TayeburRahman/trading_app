@@ -193,7 +193,7 @@ const getMessages = async (req: Request, res: Response) => {
       totalPages,
       currentPage: Number(page),
       pageSize: Number(limit),
-      lastMessage: lastMessage || null,
+      lastMessage: lastMessage || [],
     });
   } catch (error: any) {
     console.log("Error in getMessages controller:", error.message);
