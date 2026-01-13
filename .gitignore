@@ -1,8 +1,12 @@
 node_modules
-.env
 .vercel 
 logs/
 dist/
 entrypoint.sh
 yarn.lock
 src/app/modules/push-notification/firebase.config.update.json
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
+.gitignore
+config.bat

@@ -168,7 +168,7 @@ const getMessages = async (req: Request, res: Response) => {
 
     // Get paginated messages
     const messages = await Message.find({ conversationId: conversation._id })
-      .sort({ createdAt: 1 }) // oldest first for pagination
+      .sort({ createdAt: -1 }) // oldest first for pagination
       .skip(skip)
       .limit(limitMessages);
 
